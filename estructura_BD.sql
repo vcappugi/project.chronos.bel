@@ -46,6 +46,7 @@ CREATE TABLE public.actores (
     last_name VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(50),
+    password_hash VARCHAR(255), -- Contraseña encriptada (bcrypt / pgcrypto)
     is_active BOOLEAN DEFAULT TRUE NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -240,3 +241,40 @@ GRANT ALL ON ALL ROUTINES IN SCHEMA public TO anon, authenticated;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON ROUTINES TO anon, authenticated;
+
+--------------------------------------------------------------------------------
+-- MÓDULO 7: DATOS INICIALES (ROL SYSADMIN Y ACTOR ADMINISTRADOR)
+--------------------------------------------------------------------------------
+
+-- Rol exclusivo con acceso total
+INSERT INTO public.roles (name, description)
+VALUES ('sysadmin', 'Administrador del sistema con acceso total a todas las funcionalidades')
+ON CONFLICT (name) DO UPDATE SET description = EXCLUDED.description;
+
+-- Registro de objetos del sistema
+INSERT INTO public.system_objects (object_key, name, description)
+VALUES 
+    ('roles', 'Gestión de Roles', 'Administración de roles y niveles de acceso'),
+    ('system_objects', 'Objetos del Sistema', 'Catálogo de componentes y entidades del sistema'),
+    ('role_permissions', 'Permisos de Roles', 'Asignación de permisos de lectura y escritura por rol'),
+    ('actores', 'Gestión de Actores', 'Personas y usuarios participantes en proyectos'),
+    ('proyectos', 'Gestión de Proyectos', 'Administración y seguimiento de proyectos'),
+    ('actividades', 'Gestión de Actividades', 'Tareas y actividades con ponderación y avance'),
+    ('recursos', 'Gestión de Recursos', 'Materiales, equipos, costos y servicios'),
+    ('audit_logs', 'Auditoría del Sistema', 'Registro universal de cambios y transacciones'),
+    ('reportes', 'Reportes y Métricas', 'Dashboard consolidado, cálculos de costos y avance'),
+    ('configuracion', 'Configuración General', 'Parámetros y bóveda de seguridad del sistema')
+ON CONFLICT (object_key) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
+
+-- Asignación de permisos totales a sysadmin
+INSERT INTO public.role_permissions (role_id, object_id, can_read, can_write)
+SELECT 
+    r.id AS role_id,
+    so.id AS object_id,
+    TRUE AS can_read,
+    TRUE AS can_write
+FROM public.roles r
+CROSS JOIN public.system_objects so
+WHERE r.name = 'sysadmin'
+ON CONFLICT (role_id, object_id) DO UPDATE 
+SET can_read = TRUE, can_write = TRUE;
