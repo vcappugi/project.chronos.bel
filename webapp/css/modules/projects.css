@@ -1,0 +1,80 @@
+/**
+ * Project Chronos - Projects & Module Cards Styling (Yeti.css Extensions)
+ */
+
+/* Full-width Module Cards Grid */
+.modules-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.module-nav-card {
+  background: #ffffff;
+  border: 1px solid #e7e7e7;
+  border-radius: 8px;
+  padding: 1.5rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.module-nav-card:hover {
+  transform: translateY(-2px);
+  border-color: #008cba;
+  box-shadow: 0 6px 18px rgba(0, 140, 186, 0.12);
+  color: inherit;
+}
+
+.module-nav-card.active {
+  border-color: #008cba;
+  border-left: 4px solid #008cba;
+  background: #fdfdfd;
+}
+
+.module-icon-container {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: #eef7fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  color: #008cba;
+  margin-bottom: 0.25rem;
+}
+
+.module-nav-card.active .module-icon-container {
+  background: #008cba;
+  color: #ffffff;
+}
+
+.module-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+  color: #222222;
+}
+
+.module-card-desc {
+  font-size: 0.85rem;
+  color: #666666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Modals Backdrop & Transition */
+.modal.show {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-dialog {
+  margin-top: 5vh;
+}

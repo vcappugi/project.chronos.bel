@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chronos | Gestión y Control de Tiempo</title>
-  <meta name="description" content="Chronos - Plataforma de alto rendimiento para el seguimiento y gestión de tiempo y productividad.">
+  <title>Chronos | Gestión y Control de Proyectos</title>
+  <meta name="description" content="Chronos - Plataforma de alto rendimiento para el seguimiento y gestión de proyectos y productividad.">
 
   <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,6 +20,7 @@
   <!-- Yeti.css (Primary Framework) & Custom Styles -->
   <link rel="stylesheet" href="./css/yeti.css">
   <link rel="stylesheet" href="./css/chronos-custom.css">
+  <link rel="stylesheet" href="./css/modules/projects.css">
 
   <!-- Supabase Library (Utilizada en segundo plano) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -80,7 +81,7 @@
 
     <!-- Navbar Minimalista Yeti -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-      <div class="container">
+      <div class="container-fluid px-4">
         <span class="navbar-brand fw-bold d-flex align-items-center gap-2">
           <img src="./img/chronos.png" alt="Chronos Logo" class="rounded" style="height: 30px; width: auto; object-fit: contain;">
           CHRONOS
@@ -97,11 +98,225 @@
       </div>
     </nav>
 
-    <!-- Contenedor Principal (Espacio central en blanco por ahora) -->
-    <main class="container py-5" id="app-workspace-main">
-      <!-- Espacio central en blanco por ahora -->
-    </main>
+    <!-- Contenedor Principal (Usa todo el ancho de la página) -->
+    <main class="container-fluid px-4 py-4" id="app-workspace-main">
 
+      <!-- ==================================================== -->
+      <!-- TARJETAS DE OPCIONES PRINCIPALES                     -->
+      <!-- ==================================================== -->
+      <section class="modules-nav-grid" aria-label="Módulos del Sistema">
+        
+        <!-- Opción 1: Proyectos (Activa) -->
+        <div class="module-nav-card active" data-module="projects" id="card-module-projects">
+          <div class="module-icon-container">
+            <span>📁</span>
+          </div>
+          <h2 class="module-card-title">Proyectos</h2>
+          <p class="module-card-desc">Planificación, seguimiento, presupuestos y control del ciclo de vida de los proyectos.</p>
+        </div>
+
+        <!-- Opción 2: Actividades -->
+        <div class="module-nav-card" data-module="activities" id="card-module-activities">
+          <div class="module-icon-container">
+            <span>⚡</span>
+          </div>
+          <h2 class="module-card-title">Actividades</h2>
+          <p class="module-card-desc">Gestión de tareas operativas, cronogramas, responsables y avance porcentual.</p>
+        </div>
+
+        <!-- Opción 3: Recursos -->
+        <div class="module-nav-card" data-module="resources" id="card-module-resources">
+          <div class="module-icon-container">
+            <span>📦</span>
+          </div>
+          <h2 class="module-card-title">Recursos</h2>
+          <p class="module-card-desc">Catálogo de insumos, materiales, equipos y tarifas unitarias en dólares.</p>
+        </div>
+
+        <!-- Opción 4: Actores y Roles -->
+        <div class="module-nav-card" data-module="actors" id="card-module-actors">
+          <div class="module-icon-container">
+            <span>👥</span>
+          </div>
+          <h2 class="module-card-title">Actores y Roles</h2>
+          <p class="module-card-desc">Directorio de colaboradores, asignación de roles y permisos del sistema.</p>
+        </div>
+
+        <!-- Opción 5: Auditoría -->
+        <div class="module-nav-card" data-module="audit" id="card-module-audit">
+          <div class="module-icon-container">
+            <span>🛡️</span>
+          </div>
+          <h2 class="module-card-title">Auditoría</h2>
+          <p class="module-card-desc">Trazabilidad universal de modificaciones, inserciones y eventos de seguridad.</p>
+        </div>
+
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- CRUD DE PROYECTOS (A TODO EL ANCHO)                  -->
+      <!-- ==================================================== -->
+      <section id="section-projects-crud" class="card border-0 shadow-sm">
+        
+        <!-- Header del Módulo -->
+        <div class="card-header bg-white py-3 border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <h3 class="h4 mb-0 fw-bold text-dark">Gestión de Proyectos</h3>
+            <span id="projects-count-badge" class="badge bg-secondary">0 proyectos</span>
+            <div id="projects-loading" class="spinner-border spinner-border-sm text-primary d-none" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+          <button id="btn-new-project" class="btn btn-primary fw-bold shadow-sm">
+            <span class="me-1">➕</span> Nuevo Proyecto
+          </button>
+        </div>
+
+        <!-- Barra de Búsqueda y Filtros -->
+        <div class="card-body border-top border-bottom py-3 bg-light">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-6 col-lg-5">
+              <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">🔍</span>
+                <input 
+                  type="text" 
+                  id="project-search-input" 
+                  class="form-control border-start-0" 
+                  placeholder="Buscar por nombre o descripción..."
+                  autocomplete="off"
+                >
+              </div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+              <select id="project-filter-status" class="form-select">
+                <option value="">Todos los Estados</option>
+                <option value="PLANIFICACION">Planificación</option>
+                <option value="EN_EJECUCION">En Ejecución</option>
+                <option value="SUSPENDIDO">Suspendido</option>
+                <option value="FINALIZADO">Finalizado</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Proyectos (Yeti.css) -->
+        <div class="table-responsive">
+          <table class="table table-hover table-striped align-middle mb-0">
+            <thead class="table-light text-uppercase small fw-bold">
+              <tr>
+                <th style="min-width: 280px;">Proyecto y Descripción</th>
+                <th style="width: 160px;">Estado</th>
+                <th style="width: 220px;">Plazos (Inicio / Fin)</th>
+                <th class="text-end" style="width: 140px;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="projects-table-body">
+              <!-- Filas generadas dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Estado Vacío -->
+        <div id="projects-empty-state" class="text-center py-5 d-none">
+          <div class="fs-1 mb-2">📁</div>
+          <h4 class="h5 fw-bold text-dark">No hay proyectos registrados</h4>
+          <p class="text-muted small mb-0">Comienza haciendo clic en el botón <strong>"Nuevo Proyecto"</strong>.</p>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CREAR / EDITAR PROYECTO                           -->
+  <!-- ======================================================== -->
+  <div class="modal fade" id="modal-project" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold" id="modal-project-title">Nuevo Proyecto</h5>
+          <button type="button" class="btn-close btn-close-white" id="btn-close-project-modal" aria-label="Cerrar"></button>
+        </div>
+        
+        <form id="form-project">
+          <div class="modal-body p-4">
+            <input type="hidden" id="project-id">
+
+            <div class="mb-3">
+              <label for="project-name" class="form-label fw-bold small text-muted">Nombre del Proyecto *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="project-name" 
+                placeholder="Ej. Modernización de Infraestructura Cloud" 
+                required
+                autocomplete="off"
+              >
+            </div>
+
+            <div class="mb-3">
+              <label for="project-description" class="form-label fw-bold small text-muted">Descripción</label>
+              <textarea 
+                class="form-control" 
+                id="project-description" 
+                rows="3" 
+                placeholder="Describe los alcances y objetivos principales del proyecto..."
+              ></textarea>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="project-start-date" class="form-label fw-bold small text-muted">Fecha de Inicio</label>
+                <input type="date" class="form-control" id="project-start-date">
+              </div>
+              <div class="col-md-6">
+                <label for="project-end-date" class="form-label fw-bold small text-muted">Fecha de Culminación</label>
+                <input type="date" class="form-control" id="project-end-date">
+              </div>
+            </div>
+
+            <div class="mb-2">
+              <label for="project-status" class="form-label fw-bold small text-muted">Estado del Proyecto</label>
+              <select class="form-select" id="project-status">
+                <option value="PLANIFICACION">Planificación</option>
+                <option value="EN_EJECUCION">En Ejecución</option>
+                <option value="SUSPENDIDO">Suspendido</option>
+                <option value="FINALIZADO">Finalizado</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" id="btn-cancel-project-modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary fw-bold" id="btn-save-project">Guardar Proyecto</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CONFIRMACIÓN DE ELIMINACIÓN                       -->
+  <!-- ======================================================== -->
+  <div class="modal fade" id="modal-delete-project" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title fw-bold">Confirmar Eliminación</h5>
+          <button type="button" class="btn-close btn-close-white" id="btn-close-delete-modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body p-4 text-center">
+          <div class="fs-1 text-danger mb-2">⚠️</div>
+          <h4 class="h5 fw-bold text-dark mb-2">¿Deseas eliminar este proyecto?</h4>
+          <p class="text-muted mb-0">Esta acción eliminará el proyecto <strong id="delete-project-name" class="text-dark"></strong> y sus actividades asociadas de manera permanente.</p>
+        </div>
+        <div class="modal-footer bg-light justify-content-center">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-delete-modal">Cancelar</button>
+          <button type="button" class="btn btn-danger fw-bold" id="btn-confirm-delete-project">Sí, Eliminar</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Contenedor para Notificaciones Toast -->
