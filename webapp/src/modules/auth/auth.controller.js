@@ -21,6 +21,7 @@ export class AuthController {
     this.form = document.getElementById('login-form');
     this.userInput = document.getElementById('login-username');
     this.passwordInput = document.getElementById('login-password');
+    this.rememberMeCheckbox = document.getElementById('login-remember-me');
     this.submitBtn = document.getElementById('login-submit-btn');
     this.errorAlert = document.getElementById('login-error-alert');
 
@@ -28,6 +29,12 @@ export class AuthController {
     this.userNameText = document.getElementById('user-name-text');
     this.userRoleBadge = document.getElementById('user-role-badge');
     this.signOutBtn = document.getElementById('sign-out-btn');
+
+    // Pre-populate last username if available
+    const lastUser = localStorage.getItem('chronos_last_username');
+    if (lastUser && this.userInput && !this.userInput.value) {
+      this.userInput.value = lastUser;
+    }
   }
 
   bindEvents() {
@@ -46,6 +53,7 @@ export class AuthController {
 
     const username = this.userInput?.value?.trim();
     const password = this.passwordInput?.value;
+    const rememberMe = this.rememberMeCheckbox ? this.rememberMeCheckbox.checked : true;
 
     if (!username || !password) {
       this.showError('Por favor ingresa tu usuario y clave.');
@@ -55,7 +63,7 @@ export class AuthController {
     this.setLoading(true);
 
     try {
-      const result = await AuthService.signIn(username, password);
+      const result = await AuthService.signIn(username, password, { rememberMe });
       this.handleSessionEstablished(result.user, result.actor);
     } catch (err) {
       this.showError(err.message || 'Usuario o clave incorrectos.');

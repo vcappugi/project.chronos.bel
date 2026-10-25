@@ -1,0 +1,36 @@
+/**
+ * Project Chronos - Actors Module Styles
+ * Designed for Yeti.css with avatar circles and status badges.
+ */
+
+.actors-view {
+  animation: fadeInActors 0.25s ease-out;
+}
+
+@keyframes fadeInActors {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Avatar Circle */
+.actor-avatar-circle {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #008cba 0%, #43ac6a 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: -0.02em;
+  box-shadow: 0 2px 6px rgba(0, 140, 186, 0.25);
+}

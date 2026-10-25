@@ -12,15 +12,18 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- App Icons -->
-  <link rel="icon" type="image/x-icon" href="./favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="./img/favicon.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="./img/icon-192.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="./img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="./img/solo_chronos.png?v=2">
+  <link rel="icon" type="image/png" sizes="192x192" href="./img/solo_chronos.png?v=2">
+  <link rel="apple-touch-icon" href="./img/solo_chronos.png?v=2">
 
   <!-- Yeti.css (Primary Framework) & Custom Styles -->
   <link rel="stylesheet" href="./css/yeti.css">
   <link rel="stylesheet" href="./css/chronos-custom.css">
   <link rel="stylesheet" href="./css/modules/projects.css">
+  <link rel="stylesheet" href="./css/modules/dashboard.css">
+  <link rel="stylesheet" href="./css/modules/activities.css">
+  <link rel="stylesheet" href="./css/modules/actors.css">
+  <link rel="stylesheet" href="./css/modules/roles.css">
 
   <!-- Supabase Library (Utilizada en segundo plano) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -33,8 +36,8 @@
   <div id="view-auth-login" class="login-wrapper">
     <div class="login-card">
       <div class="text-center mb-4">
-        <!-- Logo de la aplicación desde img/chronos.png -->
-        <img src="./img/chronos.png" alt="Chronos Logo" class="login-logo">
+        <!-- Logo de la aplicación desde img/solo_chronos.png -->
+        <img src="./img/solo_chronos.png?v=2" alt="Chronos Logo" class="login-logo">
         <h1 class="login-brand-title">CHRONOS</h1>
         <p class="login-brand-subtitle">Control de Tiempo y Productividad</p>
       </div>
@@ -55,7 +58,7 @@
           >
         </div>
 
-        <div class="mb-4">
+        <div class="mb-3">
           <label for="login-password" class="form-label fw-bold small text-muted">Clave</label>
           <input 
             type="password" 
@@ -67,10 +70,39 @@
           >
         </div>
 
-        <button type="submit" id="login-submit-btn" class="btn btn-primary w-100 py-2 fw-bold">
+        <!-- Opción Mantener Iniciado -->
+        <div class="mb-4 form-check d-flex align-items-center gap-2">
+          <input 
+            type="checkbox" 
+            class="form-check-input mt-0" 
+            id="login-remember-me" 
+            checked
+          >
+          <label class="form-check-label small text-muted user-select-none" for="login-remember-me" style="cursor: pointer;">
+            Mantener Iniciado
+          </label>
+        </div>
+
+        <button type="submit" id="login-submit-btn" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
           Iniciar Sesión
         </button>
       </form>
+
+      <!-- Enlace para Descargar App de Android -->
+      <div class="login-footer text-center mt-4 pt-3 border-top">
+        <a 
+          href="./downloads/chronos.apk" 
+          id="link-download-android" 
+          class="btn btn-sm btn-outline-secondary btn-android-download w-100 py-2 d-flex align-items-center justify-content-center gap-2 text-decoration-none shadow-sm" 
+          download="chronos.apk" 
+          title="Descargar instalador de Chronos para Android (.apk)"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#2bb868" class="android-svg-icon">
+            <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5802 8.4116 13.8433 8.087 12 8.087c-1.8433 0-3.5802.3246-5.1368.8627L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>
+          </svg>
+          <span class="small fw-semibold">Descargar App Android (.APK)</span>
+        </a>
+      </div>
     </div>
   </div>
 
@@ -83,7 +115,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
       <div class="container-fluid px-4">
         <span class="navbar-brand fw-bold d-flex align-items-center gap-2">
-          <img src="./img/chronos.png" alt="Chronos Logo" class="rounded" style="height: 30px; width: auto; object-fit: contain;">
+          <img src="./img/solo_chronos.png?v=2" alt="Chronos Logo" style="height: 32px; width: auto; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));">
           CHRONOS
         </span>
 
@@ -106,8 +138,17 @@
       <!-- ==================================================== -->
       <section class="modules-nav-grid" aria-label="Módulos del Sistema">
         
-        <!-- Opción 1: Proyectos (Activa) -->
-        <div class="module-nav-card active" data-module="projects" id="card-module-projects">
+        <!-- Opción 1: Dashboard General (Activa por defecto, primera a la izquierda) -->
+        <div class="module-nav-card active" data-module="dashboard" id="card-module-dashboard">
+          <div class="module-icon-container">
+            <span>📊</span>
+          </div>
+          <h2 class="module-card-title">Dashboard General</h2>
+          <p class="module-card-desc">Visión global ejecutiva, indicadores clave de desempeño, avance de proyectos y actividades recientes.</p>
+        </div>
+
+        <!-- Opción 2: Proyectos -->
+        <div class="module-nav-card" data-module="projects" id="card-module-projects">
           <div class="module-icon-container">
             <span>📁</span>
           </div>
@@ -115,7 +156,7 @@
           <p class="module-card-desc">Planificación, seguimiento, presupuestos y control del ciclo de vida de los proyectos.</p>
         </div>
 
-        <!-- Opción 2: Actividades -->
+        <!-- Opción 3: Actividades -->
         <div class="module-nav-card" data-module="activities" id="card-module-activities">
           <div class="module-icon-container">
             <span>⚡</span>
@@ -124,7 +165,7 @@
           <p class="module-card-desc">Gestión de tareas operativas, cronogramas, responsables y avance porcentual.</p>
         </div>
 
-        <!-- Opción 3: Recursos -->
+        <!-- Opción 4: Recursos -->
         <div class="module-nav-card" data-module="resources" id="card-module-resources">
           <div class="module-icon-container">
             <span>📦</span>
@@ -133,7 +174,7 @@
           <p class="module-card-desc">Catálogo de insumos, materiales, equipos y tarifas unitarias en dólares.</p>
         </div>
 
-        <!-- Opción 4: Actores y Roles -->
+        <!-- Opción 5: Actores y Roles -->
         <div class="module-nav-card" data-module="actors" id="card-module-actors">
           <div class="module-icon-container">
             <span>👥</span>
@@ -142,7 +183,7 @@
           <p class="module-card-desc">Directorio de colaboradores, asignación de roles y permisos del sistema.</p>
         </div>
 
-        <!-- Opción 5: Auditoría -->
+        <!-- Opción 6: Auditoría -->
         <div class="module-nav-card" data-module="audit" id="card-module-audit">
           <div class="module-icon-container">
             <span>🛡️</span>
@@ -151,12 +192,251 @@
           <p class="module-card-desc">Trazabilidad universal de modificaciones, inserciones y eventos de seguridad.</p>
         </div>
 
+        <!-- Opción 7: Configuración (Con desplegable) -->
+        <div class="module-nav-card" data-module="config" id="card-module-config">
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="module-icon-container">
+              <span>⚙️</span>
+            </div>
+            <span class="badge bg-light text-muted border small config-chevron" id="config-card-chevron">▼</span>
+          </div>
+          <h2 class="module-card-title">Configuración</h2>
+          <p class="module-card-desc">Parámetros del sistema, gestión de accesos y seguridad.</p>
+        </div>
+
       </section>
 
       <!-- ==================================================== -->
-      <!-- CRUD DE PROYECTOS (A TODO EL ANCHO)                  -->
+      <!-- DESPLEGABLE DE TARJETAS DE CONFIGURACIÓN             -->
       <!-- ==================================================== -->
-      <section id="section-projects-crud" class="card border-0 shadow-sm">
+      <section id="config-submodules-panel" class="config-submodules-panel d-none mb-4" aria-label="Submódulos de Configuración">
+        <div class="card border-0 shadow-sm bg-light p-3">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-uppercase small fw-bold text-dark d-flex align-items-center gap-2">
+              <span class="fs-6">⚙️</span> Configuración del Sistema
+            </span>
+            <button type="button" class="btn-close btn-sm" id="btn-close-config-panel" aria-label="Cerrar panel"></button>
+          </div>
+          <div class="submodules-grid">
+            
+            <!-- Sub-tarjeta 1: Roles -->
+            <div class="submodule-card" data-submodule="roles" id="card-submodule-roles">
+              <div class="submodule-icon">
+                <span>👑</span>
+              </div>
+              <div>
+                <h4 class="submodule-title">Roles</h4>
+                <p class="submodule-desc">Catálogo de roles, jerarquías y niveles administrativos del sistema.</p>
+              </div>
+            </div>
+
+            <!-- Sub-tarjeta 3: Permisología -->
+            <div class="submodule-card" data-submodule="permissions" id="card-submodule-permissions">
+              <div class="submodule-icon">
+                <span>🔐</span>
+              </div>
+              <div>
+                <h4 class="submodule-title">Permisología</h4>
+                <p class="submodule-desc">Matriz de asignación de permisos de lectura y escritura por rol y objeto.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- 1. DASHBOARD GENERAL (VISTA INICIAL)                 -->
+      <!-- ==================================================== -->
+      <section id="section-dashboard" class="dashboard-module-view mb-4">
+        
+        <!-- Header del Dashboard -->
+        <div class="card border-0 shadow-sm mb-4 bg-white">
+          <div class="card-body p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary px-2 py-1 text-uppercase fw-bold" style="font-size: 0.75rem;">Panel Ejecutivo</span>
+                <span class="text-muted small">| Actualización en Tiempo Real</span>
+              </div>
+              <h2 class="h3 fw-bold text-dark mb-1">Dashboard General de Control</h2>
+              <p class="text-muted small mb-0">Consolidado general de operaciones, avance porcentual de proyectos, métricas presupuestarias y actividad de auditoría.</p>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+              <button id="btn-refresh-dashboard" class="btn btn-outline-secondary fw-semibold shadow-sm d-flex align-items-center gap-2" title="Recargar métricas">
+                <span id="dash-refresh-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                <span>🔄 Actualizar</span>
+              </button>
+              <button id="btn-dash-new-project" class="btn btn-primary fw-bold shadow-sm d-flex align-items-center gap-1">
+                <span>➕</span> <span>Nuevo Proyecto</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila 1: Métricas / KPIs Principales (5 Tarjetas Clave) -->
+        <div class="row g-3 mb-4">
+          <!-- KPI 1: Proyectos Totales -->
+          <div class="col-sm-6 col-lg">
+            <div class="card border-0 shadow-sm h-100 metric-kpi-card">
+              <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="text-uppercase small fw-bold text-muted">Proyectos</span>
+                  <div class="kpi-icon-circle bg-primary-subtle text-primary">📁</div>
+                </div>
+                <div class="h2 fw-bold text-dark mb-1 font-monospace" id="kpi-total-projects">0</div>
+                <div class="small text-muted d-flex align-items-center gap-1 flex-wrap" id="kpi-projects-breakdown">
+                  <span class="badge bg-info text-dark" id="kpi-count-plan">0 Plan</span>
+                  <span class="badge bg-primary" id="kpi-count-exec">0 Ejecución</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 2: Avance Global Promedio -->
+          <div class="col-sm-6 col-lg">
+            <div class="card border-0 shadow-sm h-100 metric-kpi-card">
+              <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="text-uppercase small fw-bold text-muted">Avance Promedio</span>
+                  <div class="kpi-icon-circle bg-success-subtle text-success">📈</div>
+                </div>
+                <div class="h2 fw-bold text-dark mb-1 font-monospace" id="kpi-avg-progress">0%</div>
+                <div class="progress mt-2" style="height: 6px;">
+                  <div id="kpi-progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Consolidado ponderado</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 3: Inversión / Presupuesto Total (USD) -->
+          <div class="col-sm-6 col-lg">
+            <div class="card border-0 shadow-sm h-100 metric-kpi-card">
+              <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="text-uppercase small fw-bold text-muted">Gasto Asignado</span>
+                  <div class="kpi-icon-circle bg-warning-subtle text-warning">💵</div>
+                </div>
+                <div class="h2 fw-bold text-dark mb-1 font-monospace" id="kpi-total-budget">$0.00</div>
+                <div class="small text-muted" style="font-size: 0.75rem;">Inversión calculada (USD)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 4: Actividades Registradas -->
+          <div class="col-sm-6 col-lg">
+            <div class="card border-0 shadow-sm h-100 metric-kpi-card">
+              <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="text-uppercase small fw-bold text-muted">Actividades</span>
+                  <div class="kpi-icon-circle bg-info-subtle text-info">⚡</div>
+                </div>
+                <div class="h2 fw-bold text-dark mb-1 font-monospace" id="kpi-total-activities">0</div>
+                <div class="small text-muted" style="font-size: 0.75rem;">Tareas operativas</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 5: Equipo / Colaboradores -->
+          <div class="col-sm-6 col-lg">
+            <div class="card border-0 shadow-sm h-100 metric-kpi-card">
+              <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="text-uppercase small fw-bold text-muted">Equipo</span>
+                  <div class="kpi-icon-circle bg-secondary-subtle text-secondary">👥</div>
+                </div>
+                <div class="h2 fw-bold text-dark mb-1 font-monospace" id="kpi-total-actors">0</div>
+                <div class="small text-muted" style="font-size: 0.75rem;">Actores vinculados</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila 2: Tablas y Desglose Visual (2 Columnas: 8 cols y 4 cols) -->
+        <div class="row g-4">
+          <!-- Columna Izquierda (8 cols): Resumen de Proyectos y Progreso -->
+          <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+              <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fs-5">📁</span>
+                  <h4 class="h5 mb-0 fw-bold text-dark">Estado y Avance de Proyectos</h4>
+                </div>
+                <button id="btn-dash-view-all-projects" class="btn btn-sm btn-outline-primary fw-semibold">
+                  Ver Todos en Gestión →
+                </button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light text-uppercase small fw-bold">
+                    <tr>
+                      <th style="min-width: 240px;">Proyecto</th>
+                      <th style="width: 140px;">Estado</th>
+                      <th style="width: 180px;">Progreso Estimado</th>
+                      <th style="width: 130px;">Inversión</th>
+                      <th class="text-end" style="width: 100px;">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dash-projects-table-body">
+                    <!-- Renderizado dinámicamente -->
+                  </tbody>
+                </table>
+              </div>
+
+              <div id="dash-projects-empty" class="text-center py-5 d-none">
+                <div class="fs-1 mb-2 text-muted">📂</div>
+                <h5 class="fw-bold text-dark mb-1">Sin proyectos registrados</h5>
+                <p class="text-muted small mb-3">Comienza creando tu primer proyecto para monitorear sus indicadores.</p>
+                <button id="btn-dash-create-first-project" class="btn btn-sm btn-primary fw-bold">
+                  ➕ Crear Primer Proyecto
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna Derecha (4 cols): Distribución y Actividad Reciente -->
+          <div class="col-lg-4">
+            <!-- Distribución por Estado -->
+            <div class="card border-0 shadow-sm mb-4">
+              <div class="card-header bg-white py-3 border-0">
+                <h5 class="h6 mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                  <span>🎯</span> Distribución por Estado
+                </h5>
+              </div>
+              <div class="card-body pt-0 pb-3">
+                <div class="d-flex flex-column gap-3" id="dash-status-distribution-container">
+                  <!-- Dinámico -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Auditoría y Actividad Reciente -->
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                <h5 class="h6 mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                  <span>🛡️</span> Actividad Reciente
+                </h5>
+                <span class="badge bg-light text-muted border small">Auditoría</span>
+              </div>
+              <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="dash-audit-recent-list">
+                  <!-- Dinámico -->
+                </div>
+                <div id="dash-audit-empty" class="text-center py-4 text-muted small d-none">
+                  No hay registros de auditoría recientes.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- 2. CRUD DE PROYECTOS (A TODO EL ANCHO)               -->
+      <!-- ==================================================== -->
+      <section id="section-projects-crud" class="card border-0 shadow-sm d-none">
         
         <!-- Header del Módulo -->
         <div class="card-header bg-white py-3 border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
@@ -221,6 +501,225 @@
           <div class="fs-1 mb-2">📁</div>
           <h4 class="h5 fw-bold text-dark">No hay proyectos registrados</h4>
           <p class="text-muted small mb-0">Comienza haciendo clic en el botón <strong>"Nuevo Proyecto"</strong>.</p>
+        </div>
+
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- 3. CRUD DE ACTIVIDADES (A TODO EL ANCHO)             -->
+      <!-- ==================================================== -->
+      <section id="section-activities-crud" class="card border-0 shadow-sm d-none activities-view">
+        
+        <!-- Header del Módulo -->
+        <div class="card-header bg-white py-3 border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <h3 class="h4 mb-0 fw-bold text-dark">Gestión de Actividades</h3>
+            <span id="activities-count-badge" class="badge bg-secondary">0 actividades</span>
+            <div id="activities-loading" class="spinner-border spinner-border-sm text-primary d-none" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+          <button id="btn-new-activity" class="btn btn-primary fw-bold shadow-sm">
+            <span class="me-1">➕</span> Nueva Actividad
+          </button>
+        </div>
+
+        <!-- Barra de Búsqueda y Filtros -->
+        <div class="card-body border-top border-bottom py-3 bg-light">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-5 col-lg-5">
+              <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">🔍</span>
+                <input 
+                  type="text" 
+                  id="activity-search-input" 
+                  class="form-control border-start-0" 
+                  placeholder="Buscar por nombre o descripción de actividad..."
+                  autocomplete="off"
+                >
+              </div>
+            </div>
+            <div class="col-md-4 col-lg-4">
+              <select id="activity-filter-project" class="form-select">
+                <option value="">Todos los Proyectos</option>
+              </select>
+            </div>
+            <div class="col-md-3 col-lg-3">
+              <select id="activity-filter-status" class="form-select">
+                <option value="">Todos los Estados</option>
+                <option value="PENDIENTE">Pendiente</option>
+                <option value="EN_PROCESO">En Proceso</option>
+                <option value="SUSPENDIDA">Suspendida</option>
+                <option value="FINALIZADA">Finalizada</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Actividades (Yeti.css) -->
+        <div class="table-responsive">
+          <table class="table table-hover table-striped align-middle mb-0">
+            <thead class="table-light text-uppercase small fw-bold">
+              <tr>
+                <th style="min-width: 280px;">Actividad y Proyecto</th>
+                <th style="width: 150px;">Estado</th>
+                <th style="width: 200px;">Avance y Ponderación</th>
+                <th style="width: 200px;">Plazos (Inicio / Fin)</th>
+                <th class="text-end" style="width: 140px;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="activities-table-body">
+              <!-- Filas generadas dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Estado Vacío -->
+        <div id="activities-empty-state" class="text-center py-5 d-none">
+          <div class="fs-1 mb-2">⚡</div>
+          <h4 class="h5 fw-bold text-dark">No hay actividades registradas</h4>
+          <p class="text-muted small mb-0">Comienza haciendo clic en el botón <strong>"Nueva Actividad"</strong>.</p>
+        </div>
+
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- 4. CRUD DE ACTORES Y ROLES (A TODO EL ANCHO)         -->
+      <!-- ==================================================== -->
+      <section id="section-actors-crud" class="card border-0 shadow-sm d-none actors-view">
+        
+        <!-- Header del Módulo -->
+        <div class="card-header bg-white py-3 border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <h3 class="h4 mb-0 fw-bold text-dark">Directorio de Actores y Colaboradores</h3>
+            <span id="actors-count-badge" class="badge bg-secondary">0 colaboradores</span>
+            <div id="actors-loading" class="spinner-border spinner-border-sm text-primary d-none" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+          <button id="btn-new-actor" class="btn btn-primary fw-bold shadow-sm">
+            <span class="me-1">➕</span> Nuevo Colaborador
+          </button>
+        </div>
+
+        <!-- Barra de Búsqueda y Filtros -->
+        <div class="card-body border-top border-bottom py-3 bg-light">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-5 col-lg-5">
+              <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">🔍</span>
+                <input 
+                  type="text" 
+                  id="actor-search-input" 
+                  class="form-control border-start-0" 
+                  placeholder="Buscar por nombre, apellido, correo o teléfono..."
+                  autocomplete="off"
+                >
+              </div>
+            </div>
+            <div class="col-md-4 col-lg-4">
+              <select id="actor-filter-role" class="form-select">
+                <option value="">Todos los Roles</option>
+              </select>
+            </div>
+            <div class="col-md-3 col-lg-3">
+              <select id="actor-filter-status" class="form-select">
+                <option value="">Todos los Estados</option>
+                <option value="true">Solo Activos</option>
+                <option value="false">Inactivos</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Actores (Yeti.css) -->
+        <div class="table-responsive">
+          <table class="table table-hover table-striped align-middle mb-0">
+            <thead class="table-light text-uppercase small fw-bold">
+              <tr>
+                <th style="min-width: 260px;">Colaborador</th>
+                <th style="width: 160px;">Contacto</th>
+                <th style="width: 160px;">Rol Asignado</th>
+                <th style="width: 120px;">Estado</th>
+                <th style="width: 160px;">Actividades</th>
+                <th class="text-end" style="width: 140px;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="actors-table-body">
+              <!-- Filas generadas dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Estado Vacío -->
+        <div id="actors-empty-state" class="text-center py-5 d-none">
+          <div class="fs-1 mb-2">👥</div>
+          <h4 class="h5 fw-bold text-dark">No hay colaboradores registrados</h4>
+          <p class="text-muted small mb-0">Comienza haciendo clic en el botón <strong>"Nuevo Colaborador"</strong>.</p>
+        </div>
+
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- 5. CRUD DE ROLES DEL SISTEMA (A TODO EL ANCHO)       -->
+      <!-- ==================================================== -->
+      <section id="section-roles-crud" class="card border-0 shadow-sm d-none roles-view">
+        
+        <!-- Header del Módulo -->
+        <div class="card-header bg-white py-3 border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <h3 class="h4 mb-0 fw-bold text-dark">Catálogo de Roles del Sistema</h3>
+            <span id="roles-count-badge" class="badge bg-secondary">0 roles</span>
+            <div id="roles-loading" class="spinner-border spinner-border-sm text-primary d-none" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+          <button id="btn-new-role" class="btn btn-primary fw-bold shadow-sm">
+            <span class="me-1">➕</span> Nuevo Rol
+          </button>
+        </div>
+
+        <!-- Barra de Búsqueda -->
+        <div class="card-body border-top border-bottom py-3 bg-light">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-6 col-lg-5">
+              <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">🔍</span>
+                <input 
+                  type="text" 
+                  id="role-search-input" 
+                  class="form-control border-start-0" 
+                  placeholder="Buscar por identificador de rol o descripción..."
+                  autocomplete="off"
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Roles (Yeti.css) -->
+        <div class="table-responsive">
+          <table class="table table-hover table-striped align-middle mb-0">
+            <thead class="table-light text-uppercase small fw-bold">
+              <tr>
+                <th style="min-width: 200px;">Rol</th>
+                <th style="min-width: 280px;">Descripción</th>
+                <th style="width: 170px;">Colaboradores</th>
+                <th style="width: 160px;">Permisos</th>
+                <th class="text-end" style="width: 140px;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="roles-table-body">
+              <!-- Filas generadas dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Estado Vacío -->
+        <div id="roles-empty-state" class="text-center py-5 d-none">
+          <div class="fs-1 mb-2">👑</div>
+          <h4 class="h5 fw-bold text-dark">No hay roles registrados</h4>
+          <p class="text-muted small mb-0">Comienza haciendo clic en el botón <strong>"Nuevo Rol"</strong>.</p>
         </div>
 
       </section>
@@ -314,6 +813,500 @@
         <div class="modal-footer bg-light justify-content-center">
           <button type="button" class="btn btn-secondary" id="btn-cancel-delete-modal">Cancelar</button>
           <button type="button" class="btn btn-danger fw-bold" id="btn-confirm-delete-project">Sí, Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CREAR / EDITAR ACTIVIDAD                          -->
+  <!-- ======================================================== -->
+  <div class="modal fade" id="modal-activity" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold" id="modal-activity-title">Nueva Actividad</h5>
+          <button type="button" class="btn-close btn-close-white" id="btn-close-activity-modal" aria-label="Cerrar"></button>
+        </div>
+        
+        <form id="form-activity">
+          <div class="modal-body p-4">
+            <input type="hidden" id="activity-id">
+
+            <div class="mb-3">
+              <label for="activity-project-id" class="form-label fw-bold small text-muted">Proyecto Asociado *</label>
+              <select class="form-select" id="activity-project-id" required>
+                <option value="">-- Selecciona un Proyecto * --</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="activity-name" class="form-label fw-bold small text-muted">Nombre de la Actividad *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="activity-name" 
+                placeholder="Ej. Diseño de planos estructurales o Configuración de base de datos" 
+                required
+                autocomplete="off"
+              >
+            </div>
+
+            <div class="mb-3">
+              <label for="activity-description" class="form-label fw-bold small text-muted">Descripción</label>
+              <textarea 
+                class="form-control" 
+                id="activity-description" 
+                rows="3" 
+                placeholder="Detalla las especificaciones técnicas o entregables de esta actividad..."
+              ></textarea>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="activity-weight" class="form-label fw-bold small text-muted">Ponderación / Peso (Relativo al Proyecto)</label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="activity-weight" 
+                  value="1.00" 
+                  step="0.05" 
+                  min="0.05" 
+                  max="100.00"
+                  required
+                >
+                <div class="form-text small">Peso asignado para el cálculo global del proyecto (Defecto: 1.00).</div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <label for="activity-progress" class="form-label fw-bold small text-muted mb-0">Porcentaje de Avance</label>
+                  <span id="activity-progress-val" class="badge bg-primary activity-progress-badge">0%</span>
+                </div>
+                <input 
+                  type="range" 
+                  class="form-range form-range-activity mt-2" 
+                  id="activity-progress" 
+                  min="0" 
+                  max="100" 
+                  step="5" 
+                  value="0"
+                >
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="activity-start-date" class="form-label fw-bold small text-muted">Fecha de Inicio</label>
+                <input type="date" class="form-control" id="activity-start-date">
+              </div>
+              <div class="col-md-6">
+                <label for="activity-end-date" class="form-label fw-bold small text-muted">Fecha de Culminación</label>
+                <input type="date" class="form-control" id="activity-end-date">
+              </div>
+            </div>
+
+            <div class="mb-2">
+              <label for="activity-status" class="form-label fw-bold small text-muted">Estado de la Actividad</label>
+              <select class="form-select" id="activity-status">
+                <option value="PENDIENTE">Pendiente</option>
+                <option value="EN_PROCESO">En Proceso</option>
+                <option value="SUSPENDIDA">Suspendida</option>
+                <option value="FINALIZADA">Finalizada</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" id="btn-cancel-activity-modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary fw-bold" id="btn-save-activity">Guardar Actividad</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CONFIRMAR ELIMINACIÓN DE ACTIVIDAD                -->
+  <!-- ======================================================== -->
+  <div class="modal fade" id="modal-delete-activity" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title fw-bold">Confirmar Eliminación</h5>
+          <button type="button" class="btn-close btn-close-white" id="btn-close-delete-activity-modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body p-4 text-center">
+          <div class="fs-1 text-danger mb-2">⚠️</div>
+          <h4 class="h5 fw-bold text-dark mb-2">¿Deseas eliminar esta actividad?</h4>
+          <p class="text-muted mb-0">Esta acción eliminará la actividad <strong id="delete-activity-name" class="text-dark"></strong> de manera permanente.</p>
+        </div>
+        <div class="modal-footer bg-light justify-content-center">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-delete-activity">Cancelar</button>
+          <button type="button" class="btn btn-danger fw-bold" id="btn-confirm-delete-activity">Sí, Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: GESTIÓN DE EQUIPO (ACTIVIDAD_ACTORES)             -->
+  <!-- ======================================================== -->
+  <div class="modal fade" id="modal-activity-actors" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <div>
+            <h5 class="modal-title fw-bold mb-0">👥 Equipo Asignado a la Actividad</h5>
+            <div class="small opacity-75 mt-1" id="modal-act-actors-project">Proyecto</div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" id="btn-close-act-actors-modal" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="modal-body p-4">
+          <!-- Banner con nombre de la actividad -->
+          <div class="alert alert-info py-2 px-3 mb-3 d-flex align-items-center gap-2">
+            <span>⚡</span>
+            <div>Actividad: <strong id="modal-act-actors-title" class="text-dark"></strong></div>
+          </div>
+
+          <!-- Formulario de Asignación de Actor -->
+          <form id="form-assign-actor" class="card border-0 bg-light p-3 mb-4 shadow-sm">
+            <h6 class="fw-bold text-dark mb-2">➕ Asignar Colaborador a esta Actividad</h6>
+            <div class="row g-2 align-items-end">
+              <div class="col-md-6">
+                <label for="select-assign-actor" class="form-label small fw-bold text-muted mb-1">Colaborador / Actor *</label>
+                <select class="form-select form-select-sm" id="select-assign-actor" required>
+                  <option value="">-- Selecciona un Colaborador --</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="input-assign-actor-role" class="form-label small fw-bold text-muted mb-1">Rol del Colaborador</label>
+                <input 
+                  type="text" 
+                  class="form-control form-control-sm bg-light" 
+                  id="input-assign-actor-role" 
+                  placeholder="Rol del actor seleccionado" 
+                  readonly
+                  title="Este campo toma automáticamente el rol del colaborador seleccionado"
+                >
+              </div>
+              <div class="col-md-2">
+                <button type="submit" id="btn-submit-assign-actor" class="btn btn-sm btn-primary fw-bold w-100">
+                  Asignar
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Tabla de Actores Asignados -->
+          <h6 class="fw-bold text-dark mb-2">Colaboradores Asignados</h6>
+          <div class="table-responsive border rounded bg-white">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light text-uppercase small fw-bold">
+                <tr>
+                  <th>Colaborador</th>
+                  <th>Rol en Actividad</th>
+                  <th class="text-end" style="width: 80px;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="table-activity-actors-body">
+                <!-- Filas dinámicas -->
+              </tbody>
+            </table>
+          </div>
+
+          <div id="empty-activity-actors" class="text-center py-4 text-muted small d-none">
+            No hay colaboradores asignados actualmente a esta actividad.
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" id="btn-dismiss-act-actors-modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: GESTIÓN DE RECURSOS Y COSTOS (ACTIVIDAD_RECURSOS) -->
+  <!-- ======================================================== -->
+  <div class="modal fade" id="modal-activity-resources" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <div>
+            <h5 class="modal-title fw-bold mb-0">📦 Recursos y Costos de la Actividad</h5>
+            <div class="small opacity-75 mt-1" id="modal-act-res-project">Proyecto</div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" id="btn-close-act-res-modal" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="modal-body p-4">
+          <!-- Banner con nombre de actividad y Costo Total -->
+          <div class="d-flex flex-wrap justify-content-between align-items-center bg-light p-3 rounded mb-3 border">
+            <div>
+              <span class="text-muted small text-uppercase fw-bold">Actividad</span>
+              <h5 class="fw-bold text-dark mb-0" id="modal-act-res-title">Actividad</h5>
+            </div>
+            <div class="text-end">
+              <span class="text-muted small text-uppercase fw-bold">Costo Acumulado Total</span>
+              <div class="h4 mb-0 fw-bold font-monospace text-primary" id="act-res-total-cost">$0.00 USD</div>
+            </div>
+          </div>
+
+          <!-- Formulario de Asignación de Recurso -->
+          <form id="form-assign-resource" class="card border-0 bg-light p-3 mb-4 shadow-sm">
+            <h6 class="fw-bold text-dark mb-2">➕ Asignar Recurso / Insumo a esta Actividad</h6>
+            <div class="row g-2 align-items-end">
+              <div class="col-md-5">
+                <label for="select-assign-resource" class="form-label small fw-bold text-muted mb-1">Recurso del Catálogo *</label>
+                <select class="form-select form-select-sm" id="select-assign-resource" required>
+                  <option value="">-- Selecciona un Recurso --</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label for="input-assign-res-qty" class="form-label small fw-bold text-muted mb-1">Cantidad *</label>
+                <input 
+                  type="number" 
+                  class="form-control form-control-sm" 
+                  id="input-assign-res-qty" 
+                  value="1.00" 
+                  step="0.05" 
+                  min="0.01" 
+                  required
+                >
+              </div>
+              <div class="col-md-2">
+                <label for="input-assign-res-override" class="form-label small fw-bold text-muted mb-1">Costo Unit. (USD)</label>
+                <input 
+                  type="number" 
+                  class="form-control form-control-sm" 
+                  id="input-assign-res-override" 
+                  placeholder="Base" 
+                  step="0.01" 
+                  min="0.00"
+                >
+              </div>
+              <div class="col-md-2">
+                <button type="submit" id="btn-submit-assign-resource" class="btn btn-sm btn-primary fw-bold w-100">
+                  Asignar
+                </button>
+              </div>
+            </div>
+            <div class="form-text small mt-1">Si dejas el costo unitario vacío, se tomará el costo base del recurso en dólares.</div>
+          </form>
+
+          <!-- Tabla de Recursos Asignados -->
+          <h6 class="fw-bold text-dark mb-2">Recursos Asignados</h6>
+          <div class="table-responsive border rounded bg-white">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light text-uppercase small fw-bold">
+                <tr>
+                  <th>Recurso e Insumo</th>
+                  <th>Cantidad</th>
+                  <th>Costo Unit.</th>
+                  <th>Subtotal</th>
+                  <th class="text-end" style="width: 80px;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="table-activity-resources-body">
+                <!-- Filas dinámicas -->
+              </tbody>
+            </table>
+          </div>
+
+          <div id="empty-activity-resources" class="text-center py-4 text-muted small d-none">
+            No hay recursos asignados actualmente a esta actividad.
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" id="btn-dismiss-act-res-modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CREAR / EDITAR ACTOR                              -->
+  <!-- ======================================================== -->
+  <div class="modal fade" id="modal-actor" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold" id="modal-actor-title">Nuevo Colaborador</h5>
+          <button type="button" class="btn-close btn-close-white" id="btn-close-actor-modal" aria-label="Cerrar"></button>
+        </div>
+        
+        <form id="form-actor">
+          <div class="modal-body p-4">
+            <input type="hidden" id="actor-id">
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="actor-first-name" class="form-label fw-bold small text-muted">Nombre(s) *</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="actor-first-name" 
+                  placeholder="Ej. Carlos" 
+                  required
+                  autocomplete="given-name"
+                >
+              </div>
+              <div class="col-md-6">
+                <label for="actor-last-name" class="form-label fw-bold small text-muted">Apellido(s) *</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="actor-last-name" 
+                  placeholder="Ej. Mendoza" 
+                  required
+                  autocomplete="family-name"
+                >
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="actor-email" class="form-label fw-bold small text-muted">Correo Electrónico *</label>
+                <input 
+                  type="email" 
+                  class="form-control" 
+                  id="actor-email" 
+                  placeholder="ejemplo@chronos.io" 
+                  required
+                  autocomplete="email"
+                >
+              </div>
+              <div class="col-md-6">
+                <label for="actor-phone" class="form-label fw-bold small text-muted">Teléfono / Móvil</label>
+                <input 
+                  type="tel" 
+                  class="form-control" 
+                  id="actor-phone" 
+                  placeholder="+58 412 1234567" 
+                  autocomplete="tel"
+                >
+              </div>
+            </div>
+
+            <div class="row g-3 mb-2">
+              <div class="col-md-8">
+                <label for="actor-role-id" class="form-label fw-bold small text-muted">Rol en el Sistema *</label>
+                <select class="form-select" id="actor-role-id" required>
+                  <option value="">-- Selecciona un Rol * --</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="actor-is-active" class="form-label fw-bold small text-muted">Estado</label>
+                <select class="form-select" id="actor-is-active">
+                  <option value="true">Activo</option>
+                  <option value="false">Inactivo</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" id="btn-cancel-actor-modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary fw-bold" id="btn-save-actor">Guardar Colaborador</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CONFIRMAR ELIMINACIÓN DE ACTOR                    -->
+  <!-- ======================================================== -->
+  <div class="modal fade" id="modal-delete-actor" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title fw-bold">Confirmar Eliminación</h5>
+          <button type="button" class="btn-close btn-close-white" id="btn-close-delete-actor-modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body p-4 text-center">
+          <div class="fs-1 text-danger mb-2">⚠️</div>
+          <h4 class="h5 fw-bold text-dark mb-2">¿Deseas eliminar este colaborador?</h4>
+          <p class="text-muted mb-0">Esta acción eliminará al colaborador <strong id="delete-actor-name" class="text-dark"></strong> y sus asignaciones asociadas de manera permanente.</p>
+        </div>
+        <div class="modal-footer bg-light justify-content-center">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-delete-actor">Cancelar</button>
+          <button type="button" class="btn btn-danger fw-bold" id="btn-confirm-delete-actor">Sí, Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CREAR / EDITAR ROL                                -->
+  <!-- ======================================================== -->
+  <div class="modal fade" id="modal-role" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold" id="modal-role-title">Nuevo Rol</h5>
+          <button type="button" class="btn-close btn-close-white" id="btn-close-role-modal" aria-label="Cerrar"></button>
+        </div>
+        
+        <form id="form-role">
+          <div class="modal-body p-4">
+            <input type="hidden" id="role-id">
+
+            <div class="mb-3">
+              <label for="role-name" class="form-label fw-bold small text-muted">Nombre / Clave del Rol *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="role-name" 
+                placeholder="Ej. auditor_financiero o analista_datos" 
+                required
+                autocomplete="off"
+              >
+              <div class="form-text small">Identificador único del rol en el sistema (minúsculas, sin espacios).</div>
+            </div>
+
+            <div class="mb-2">
+              <label for="role-description" class="form-label fw-bold small text-muted">Descripción y Alcance</label>
+              <textarea 
+                class="form-control" 
+                id="role-description" 
+                rows="3" 
+                placeholder="Describe las responsabilidades y nivel de acceso que otorga este rol..."
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" id="btn-cancel-role-modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary fw-bold" id="btn-save-role">Guardar Rol</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CONFIRMAR ELIMINACIÓN DE ROL                      -->
+  <!-- ======================================================== -->
+  <div class="modal fade" id="modal-delete-role" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title fw-bold">Confirmar Eliminación</h5>
+          <button type="button" class="btn-close btn-close-white" id="btn-close-delete-role-modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body p-4 text-center">
+          <div class="fs-1 text-danger mb-2">⚠️</div>
+          <h4 class="h5 fw-bold text-dark mb-2">¿Deseas eliminar este rol?</h4>
+          <p class="text-muted mb-0">Esta acción eliminará el rol <strong id="delete-role-name" class="text-dark"></strong> de manera permanente.</p>
+        </div>
+        <div class="modal-footer bg-light justify-content-center">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-delete-role">Cancelar</button>
+          <button type="button" class="btn btn-danger fw-bold" id="btn-confirm-delete-role">Sí, Eliminar</button>
         </div>
       </div>
     </div>

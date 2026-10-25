@@ -35,12 +35,11 @@ body {
 }
 
 .login-logo {
-  max-height: 85px;
+  max-height: 90px;
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
   margin-bottom: 0.85rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
   object-fit: contain;
 }
 
@@ -48,6 +47,25 @@ body {
   font-size: 2.2rem;
   line-height: 1;
   margin-bottom: 0.5rem;
+}
+
+/* Android Download Button on Login */
+.btn-android-download {
+  border-color: #e5e7eb;
+  color: #374151;
+  background-color: #f9fafb;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-android-download:hover {
+  background-color: #2bb868;
+  border-color: #2bb868;
+  color: #ffffff;
+}
+
+.btn-android-download:hover .android-svg-icon {
+  fill: #ffffff;
 }
 
 .login-brand-title {

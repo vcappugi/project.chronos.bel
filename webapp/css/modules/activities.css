@@ -1,0 +1,66 @@
+/**
+ * Project Chronos - Activities Module Styles
+ * Designed for Yeti.css with smooth transitions and progress indicators.
+ */
+
+.activities-view {
+  animation: fadeInActivities 0.25s ease-out;
+}
+
+@keyframes fadeInActivities {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Range input styling for progress slider */
+.form-range-activity {
+  cursor: pointer;
+}
+
+.activity-progress-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* Project association tag */
+.activity-project-tag {
+  font-size: 0.775rem;
+  font-weight: 600;
+  background-color: #eef7fa;
+  color: #008cba;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Sub-CRUD Action buttons */
+.btn-manage-act-actors {
+  font-size: 0.78rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-manage-act-actors:hover {
+  transform: translateY(-1px);
+}
+
+.btn-manage-act-resources {
+  font-size: 0.78rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-manage-act-resources:hover {
+  transform: translateY(-1px);
+}

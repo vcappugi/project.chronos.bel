@@ -1,88 +1,273 @@
 /**
  * Project Chronos - Dashboard Controller
- * Renders statistical cards and recent activities using Yeti.css styles.
+ * Orchestrates executive metric KPIs, project progress table, distribution bars, and audit stream.
  */
 
 import { DashboardService } from './dashboard.service.js';
-import { TimerService } from '../timer/timer.service.js';
+import { NativeService } from '../../services/native.service.js';
+import { NotificationService } from '../../services/notification.service.js';
 
 export class DashboardController {
-  constructor({ getCurrentUser }) {
-    this.getCurrentUser = getCurrentUser;
+  constructor({ onNavigateToProjects }) {
+    this.onNavigateToProjects = onNavigateToProjects;
+    this.isLoading = false;
+
     this.initElements();
+    this.bindEvents();
   }
 
   initElements() {
-    this.statTotalTime = document.getElementById('stat-total-time');
-    this.statTodayTime = document.getElementById('stat-today-time');
-    this.statSessions = document.getElementById('stat-sessions-count');
-    this.recentListContainer = document.getElementById('recent-entries-list');
-    this.emptyState = document.getElementById('recent-entries-empty');
+    // KPI Badges and values
+    this.kpiTotalProjects = document.getElementById('kpi-total-projects');
+    this.kpiCountPlan = document.getElementById('kpi-count-plan');
+    this.kpiCountExec = document.getElementById('kpi-count-exec');
+    this.kpiAvgProgress = document.getElementById('kpi-avg-progress');
+    this.kpiProgressBar = document.getElementById('kpi-progress-bar');
+    this.kpiTotalBudget = document.getElementById('kpi-total-budget');
+    this.kpiTotalActivities = document.getElementById('kpi-total-activities');
+    this.kpiTotalActors = document.getElementById('kpi-total-actors');
+
+    // Projects summary table
+    this.projectsTableBody = document.getElementById('dash-projects-table-body');
+    this.projectsEmpty = document.getElementById('dash-projects-empty');
+
+    // Distribution and Audit
+    this.statusDistributionContainer = document.getElementById('dash-status-distribution-container');
+    this.auditRecentList = document.getElementById('dash-audit-recent-list');
+    this.auditEmpty = document.getElementById('dash-audit-empty');
+
+    // Controls
+    this.btnRefresh = document.getElementById('btn-refresh-dashboard');
+    this.refreshSpinner = document.getElementById('dash-refresh-spinner');
+    this.btnNewProject = document.getElementById('btn-dash-new-project');
+    this.btnViewAllProjects = document.getElementById('btn-dash-view-all-projects');
+    this.btnCreateFirstProject = document.getElementById('btn-dash-create-first-project');
+  }
+
+  bindEvents() {
+    this.btnRefresh?.addEventListener('click', () => {
+      NativeService.impact('light');
+      this.refresh();
+    });
+
+    this.btnNewProject?.addEventListener('click', () => {
+      NativeService.impact('light');
+      if (typeof this.onNavigateToProjects === 'function') {
+        this.onNavigateToProjects(true);
+      }
+    });
+
+    this.btnViewAllProjects?.addEventListener('click', () => {
+      NativeService.impact('light');
+      if (typeof this.onNavigateToProjects === 'function') {
+        this.onNavigateToProjects(false);
+      }
+    });
+
+    this.btnCreateFirstProject?.addEventListener('click', () => {
+      NativeService.impact('light');
+      if (typeof this.onNavigateToProjects === 'function') {
+        this.onNavigateToProjects(true);
+      }
+    });
   }
 
   /**
-   * Refreshes dashboard data
+   * Refreshes all dashboard statistics, tables, and streams
    */
   async refresh() {
-    let user = null;
-    if (typeof this.getCurrentUser === 'function') {
-      user = this.getCurrentUser();
+    if (this.isLoading) return;
+    this.setLoading(true);
+
+    try {
+      const data = await DashboardService.getDashboardSummary();
+      this.renderKPIs(data);
+      this.renderProjectsTable(data.projects);
+      this.renderStatusDistribution(data.statusCounts, data.totalProjects);
+      this.renderAuditStream(data.auditLogs);
+    } catch (err) {
+      console.error('[DashboardController] Error refreshing dashboard:', err);
+      NotificationService.error('No se pudieron actualizar todas las métricas del dashboard.');
+    } finally {
+      this.setLoading(false);
+    }
+  }
+
+  setLoading(isLoading) {
+    this.isLoading = isLoading;
+    if (this.refreshSpinner) {
+      this.refreshSpinner.classList.toggle('d-none', !isLoading);
+    }
+    if (this.btnRefresh) {
+      this.btnRefresh.disabled = isLoading;
+    }
+  }
+
+  renderKPIs(data) {
+    if (this.kpiTotalProjects) {
+      this.kpiTotalProjects.textContent = data.totalProjects;
     }
 
-    const entries = await TimerService.getEntries(user?.id);
-    this.renderMetrics(entries);
-    this.renderList(entries);
+    if (this.kpiCountPlan) {
+      this.kpiCountPlan.textContent = `${data.statusCounts.PLANIFICACION || 0} Plan`;
+    }
+
+    if (this.kpiCountExec) {
+      this.kpiCountExec.textContent = `${data.statusCounts.EN_EJECUCION || 0} Ejecución`;
+    }
+
+    if (this.kpiAvgProgress) {
+      this.kpiAvgProgress.textContent = `${data.averageProgress}%`;
+    }
+
+    if (this.kpiProgressBar) {
+      this.kpiProgressBar.style.width = `${Math.min(100, Math.max(0, data.averageProgress))}%`;
+      this.kpiProgressBar.setAttribute('aria-valuenow', data.averageProgress);
+    }
+
+    if (this.kpiTotalBudget) {
+      const formattedUSD = (data.totalBudgetUSD || 0).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+      this.kpiTotalBudget.textContent = `$${formattedUSD}`;
+    }
+
+    if (this.kpiTotalActivities) {
+      this.kpiTotalActivities.textContent = data.totalActivities;
+    }
+
+    if (this.kpiTotalActors) {
+      this.kpiTotalActors.textContent = data.totalActors;
+    }
   }
 
-  renderMetrics(entries) {
-    const metrics = DashboardService.calculateMetrics(entries);
+  renderProjectsTable(projects = []) {
+    if (!this.projectsTableBody) return;
 
-    if (this.statTotalTime) this.statTotalTime.textContent = metrics.totalTimeFormatted;
-    if (this.statTodayTime) this.statTodayTime.textContent = metrics.todayTimeFormatted;
-    if (this.statSessions) this.statSessions.textContent = metrics.totalSessions;
-  }
-
-  renderList(entries) {
-    if (!this.recentListContainer) return;
-
-    if (!entries || entries.length === 0) {
-      this.recentListContainer.innerHTML = '';
-      if (this.emptyState) this.emptyState.classList.remove('d-none');
+    if (!projects || projects.length === 0) {
+      this.projectsTableBody.innerHTML = '';
+      if (this.projectsEmpty) this.projectsEmpty.classList.remove('d-none');
       return;
     }
 
-    if (this.emptyState) this.emptyState.classList.add('d-none');
+    if (this.projectsEmpty) this.projectsEmpty.classList.add('d-none');
 
-    this.recentListContainer.innerHTML = entries.map(entry => {
-      const duration = Number(entry.duration_seconds || entry.durationSeconds) || 0;
-      const formattedDuration = TimerService.formatTime(duration);
-      const category = entry.category || 'General';
-      const title = entry.title || 'Actividad Chronos';
-      const date = new Date(entry.started_at || entry.startedAt || Date.now()).toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit'
+    this.projectsTableBody.innerHTML = projects.slice(0, 5).map(proj => {
+      const statusBadge = this.getStatusBadge(proj.status);
+      const progress = Math.round(Number(proj.calculated_progress_percentage) || 0);
+      const spentUSD = (Number(proj.total_spent_usd) || 0).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
       });
 
+      let progressColor = 'bg-info';
+      if (progress >= 80) progressColor = 'bg-success';
+      else if (progress >= 40) progressColor = 'bg-primary';
+      else if (progress > 0) progressColor = 'bg-warning';
+
       return `
-        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
-          <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
-              <span class="badge bg-primary text-uppercase">${this.escapeHtml(category)}</span>
-              <strong class="text-dark">${this.escapeHtml(title)}</strong>
+        <tr>
+          <td>
+            <div class="fw-bold text-dark">${this.escapeHtml(proj.name)}</div>
+            <div class="text-muted small text-truncate" style="max-width: 280px;">${this.escapeHtml(proj.description || 'Sin descripción')}</div>
+          </td>
+          <td>${statusBadge}</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="table-progress-box flex-grow-1">
+                <div class="table-progress-bar">
+                  <div class="table-progress-fill ${progressColor}" style="width: ${progress}%"></div>
+                </div>
+              </div>
+              <span class="small fw-bold font-monospace text-dark">${progress}%</span>
             </div>
-            <small class="text-muted">${date}</small>
+          </td>
+          <td>
+            <span class="font-monospace small fw-bold text-dark">$${spentUSD}</span>
+          </td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-primary py-0.5 px-2 btn-dash-manage" data-id="${proj.id}">
+              Ver →
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Attach click listeners to "Ver →"
+    this.projectsTableBody.querySelectorAll('.btn-dash-manage').forEach(btn => {
+      btn.addEventListener('click', () => {
+        NativeService.impact('light');
+        if (typeof this.onNavigateToProjects === 'function') {
+          this.onNavigateToProjects(false);
+        }
+      });
+    });
+  }
+
+  renderStatusDistribution(counts = {}, total = 0) {
+    if (!this.statusDistributionContainer) return;
+
+    const statuses = [
+      { key: 'PLANIFICACION', label: 'Planificación', color: '#5bc0de', count: counts.PLANIFICACION || 0 },
+      { key: 'EN_EJECUCION', label: 'En Ejecución', color: '#008cba', count: counts.EN_EJECUCION || 0 },
+      { key: 'SUSPENDIDO', label: 'Suspendidos', color: '#f0ad4e', count: counts.SUSPENDIDO || 0 },
+      { key: 'FINALIZADO', label: 'Finalizados', color: '#43ac6a', count: counts.FINALIZADO || 0 }
+    ];
+
+    this.statusDistributionContainer.innerHTML = statuses.map(st => {
+      const pct = total > 0 ? Math.round((st.count / total) * 100) : 0;
+      return `
+        <div class="status-dist-item">
+          <div class="status-dist-header">
+            <span class="fw-semibold text-dark">${st.label}</span>
+            <span class="text-muted small">${st.count} (${pct}%)</span>
           </div>
-          <div class="text-end">
-            <span class="fs-5 fw-bold text-primary font-monospace">${formattedDuration}</span>
+          <div class="status-dist-bar-wrapper">
+            <div class="status-dist-bar" style="width: ${pct}%; background-color: ${st.color};"></div>
           </div>
         </div>
       `;
     }).join('');
   }
 
+  renderAuditStream(logs = []) {
+    if (!this.auditRecentList) return;
+
+    if (!logs || logs.length === 0) {
+      this.auditRecentList.innerHTML = '';
+      if (this.auditEmpty) this.auditEmpty.classList.remove('d-none');
+      return;
+    }
+
+    if (this.auditEmpty) this.auditEmpty.classList.add('d-none');
+
+    this.auditRecentList.innerHTML = logs.map(log => `
+      <div class="audit-stream-item">
+        <span class="audit-stream-badge ${log.badgeClass}">${log.badgeLabel}</span>
+        <div class="flex-grow-1">
+          <div class="audit-stream-desc">${this.escapeHtml(log.title)}</div>
+          <div class="audit-stream-time">${log.timeFormatted}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  getStatusBadge(status) {
+    const config = {
+      'PLANIFICACION': { label: 'Planificación', class: 'badge bg-info text-dark' },
+      'EN_EJECUCION': { label: 'En Ejecución', class: 'badge bg-primary' },
+      'SUSPENDIDO': { label: 'Suspendido', class: 'badge bg-warning text-dark' },
+      'FINALIZADO': { label: 'Finalizado', class: 'badge bg-success' }
+    };
+
+    const current = config[status] || { label: status || 'Desconocido', class: 'badge bg-secondary' };
+    return `<span class="${current.class} px-2 py-1">${current.label}</span>`;
+  }
+
   escapeHtml(str) {
+    if (!str) return '';
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;

@@ -78,3 +78,86 @@
 .modal-dialog {
   margin-top: 5vh;
 }
+
+/* Config Dropdown Panel & Sub-Cards */
+.config-submodules-panel {
+  animation: fadeInDown 0.25s ease-out;
+}
+
+.config-chevron {
+  transition: transform 0.25s ease;
+  font-size: 0.7rem;
+}
+
+.module-nav-card.config-open .config-chevron {
+  transform: rotate(180deg);
+}
+
+.submodules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.submodule-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.submodule-card:hover {
+  transform: translateY(-2px);
+  border-color: #008cba;
+  box-shadow: 0 4px 14px rgba(0, 140, 186, 0.12);
+}
+
+.submodule-card.active {
+  border-color: #008cba;
+  background: #f4fafd;
+  box-shadow: 0 0 0 2px rgba(0, 140, 186, 0.2);
+}
+
+.submodule-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 6px;
+  background: #eef7fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  color: #008cba;
+}
+
+.submodule-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  color: #222222;
+}
+
+.submodule-desc {
+  font-size: 0.825rem;
+  color: #666666;
+  margin: 0;
+  line-height: 1.35;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

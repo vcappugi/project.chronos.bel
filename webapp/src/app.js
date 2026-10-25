@@ -9,6 +9,9 @@ import { AuthController } from './modules/auth/auth.controller.js';
 import { TimerController } from './modules/timer/timer.controller.js';
 import { DashboardController } from './modules/dashboard/dashboard.controller.js';
 import { ProjectsController } from './modules/projects/projects.controller.js';
+import { ActivitiesController } from './modules/activities/activities.controller.js';
+import { ActorsController } from './modules/actors/actors.controller.js';
+import { RolesController } from './modules/roles/roles.controller.js';
 import { NotificationService } from './services/notification.service.js';
 import { NativeService } from './services/native.service.js';
 
@@ -16,7 +19,7 @@ class ChronosApp {
   constructor() {
     this.currentUser = null;
     this.currentActor = null;
-    this.activeTab = 'projects';
+    this.activeTab = 'dashboard';
   }
 
   async init() {
@@ -33,10 +36,10 @@ class ChronosApp {
   }
 
   setupNativeHardwareListeners() {
-    // Android hardware Back Button navigation
+    // Android hardware Back Button navigation: return to dashboard if on another module
     NativeService.registerBackButton(() => {
-      if (this.activeTab !== 'projects') {
-        this.switchTab('projects');
+      if (this.activeTab !== 'dashboard') {
+        this.navigateToModule('dashboard');
       }
     });
 
@@ -44,8 +47,16 @@ class ChronosApp {
     NativeService.onNetworkStatusChange((isOnline) => {
       if (isOnline) {
         NotificationService.success('Conexión reestablecida. Sincronizando datos...');
-        if (this.projectsController) {
+        if (this.activeTab === 'dashboard' && this.dashboardController) {
+          this.dashboardController.refresh();
+        } else if (this.activeTab === 'projects' && this.projectsController) {
           this.projectsController.loadProjects();
+        } else if (this.activeTab === 'activities' && this.activitiesController) {
+          this.activitiesController.loadActivities();
+        } else if (this.activeTab === 'actors' && this.actorsController) {
+          this.actorsController.loadActors();
+        } else if (this.activeTab === 'roles' && this.rolesController) {
+          this.rolesController.loadRoles();
         }
       } else {
         NotificationService.warning('Modo fuera de línea: los registros se guardarán en la memoria local.');
@@ -54,55 +65,190 @@ class ChronosApp {
   }
 
   bindTabNavigation() {
-    const tabButtons = document.querySelectorAll('.nav-tab-btn');
-    tabButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const targetTab = btn.getAttribute('data-tab');
-        NativeService.impact('light');
-        this.switchTab(targetTab);
-      });
-    });
-
     // Module launcher cards
     const moduleCards = document.querySelectorAll('.module-nav-card');
+    const configPanel = document.getElementById('config-submodules-panel');
+    const configCard = document.getElementById('card-module-config');
+    const closeConfigBtn = document.getElementById('btn-close-config-panel');
+
     moduleCards.forEach(card => {
       card.addEventListener('click', (e) => {
         e.preventDefault();
         const target = card.getAttribute('data-module');
-        if (target) {
-          NativeService.impact('light');
-          moduleCards.forEach(c => c.classList.remove('active'));
-          card.classList.add('active');
+        NativeService.impact('light');
 
-          if (target === 'projects' && this.projectsController) {
-            this.projectsController.loadProjects();
+        if (target === 'config') {
+          // Toggle dropdown panel
+          const isCurrentlyOpen = configCard?.classList.contains('config-open');
+          if (isCurrentlyOpen) {
+            configCard?.classList.remove('config-open');
+            configPanel?.classList.add('d-none');
+          } else {
+            configCard?.classList.add('config-open');
+            configPanel?.classList.remove('d-none');
           }
+          return;
         }
+
+        // Close config panel if selecting any main module
+        if (configCard?.classList.contains('config-open')) {
+          configCard?.classList.remove('config-open');
+          configPanel?.classList.add('d-none');
+        }
+
+        this.navigateToModule(target);
+      });
+    });
+
+    // Close config panel button
+    closeConfigBtn?.addEventListener('click', () => {
+      NativeService.impact('light');
+      configCard?.classList.remove('config-open');
+      configPanel?.classList.add('d-none');
+    });
+
+    // Sub-module cards inside Configuración
+    const subCards = document.querySelectorAll('.submodule-card');
+    subCards.forEach(sub => {
+      sub.addEventListener('click', () => {
+        NativeService.impact('light');
+        subCards.forEach(s => s.classList.remove('active'));
+        sub.classList.add('active');
+
+        const subTarget = sub.getAttribute('data-submodule');
+        if (subTarget === 'roles') {
+          // Close config dropdown panel and switch to Roles CRUD
+          configCard?.classList.remove('config-open');
+          configPanel?.classList.add('d-none');
+          this.navigateToModule('roles');
+          return;
+        }
+
+        const subNameMap = {
+          'roles': 'Roles',
+          'permissions': 'Permisología'
+        };
+        NotificationService.info(`Módulo de configuración seleccionado: ${subNameMap[subTarget] || subTarget}`);
       });
     });
   }
 
-  switchTab(tabName) {
-    this.activeTab = tabName;
+  /**
+   * Switches views and active card state between system modules
+   * @param {string} moduleName
+   */
+  navigateToModule(moduleName) {
+    this.activeTab = moduleName;
 
-    document.querySelectorAll('.nav-tab-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
+    const moduleCards = document.querySelectorAll('.module-nav-card');
+    const sectionDashboard = document.getElementById('section-dashboard');
+    const sectionProjects = document.getElementById('section-projects-crud');
+    const sectionActivities = document.getElementById('section-activities-crud');
+    const sectionActors = document.getElementById('section-actors-crud');
+    const sectionRoles = document.getElementById('section-roles-crud');
+
+    // Update active class on top navigation cards
+    moduleCards.forEach(card => {
+      if (card.getAttribute('data-module') !== 'config') {
+        card.classList.toggle('active', card.getAttribute('data-module') === moduleName);
+      }
     });
 
-    document.querySelectorAll('.tab-view').forEach(view => {
-      view.classList.toggle('d-none', view.id !== `view-${tabName}`);
-    });
-
-    if (tabName === 'projects' && this.projectsController) {
-      this.projectsController.loadProjects();
+    // Handle module visibility
+    if (moduleName === 'dashboard') {
+      sectionDashboard?.classList.remove('d-none');
+      sectionProjects?.classList.add('d-none');
+      sectionActivities?.classList.add('d-none');
+      sectionActors?.classList.add('d-none');
+      sectionRoles?.classList.add('d-none');
+      if (this.dashboardController) {
+        this.dashboardController.refresh();
+      }
+    } else if (moduleName === 'projects') {
+      sectionDashboard?.classList.add('d-none');
+      sectionProjects?.classList.remove('d-none');
+      sectionActivities?.classList.add('d-none');
+      sectionActors?.classList.add('d-none');
+      sectionRoles?.classList.add('d-none');
+      if (this.projectsController) {
+        this.projectsController.loadProjects();
+      }
+    } else if (moduleName === 'activities') {
+      sectionDashboard?.classList.add('d-none');
+      sectionProjects?.classList.add('d-none');
+      sectionActivities?.classList.remove('d-none');
+      sectionActors?.classList.add('d-none');
+      sectionRoles?.classList.add('d-none');
+      if (this.activitiesController) {
+        this.activitiesController.loadActivities();
+      }
+    } else if (moduleName === 'actors') {
+      sectionDashboard?.classList.add('d-none');
+      sectionProjects?.classList.add('d-none');
+      sectionActivities?.classList.add('d-none');
+      sectionActors?.classList.remove('d-none');
+      sectionRoles?.classList.add('d-none');
+      if (this.actorsController) {
+        this.actorsController.loadActors();
+      }
+    } else if (moduleName === 'roles') {
+      sectionDashboard?.classList.add('d-none');
+      sectionProjects?.classList.add('d-none');
+      sectionActivities?.classList.add('d-none');
+      sectionActors?.classList.add('d-none');
+      sectionRoles?.classList.remove('d-none');
+      if (this.rolesController) {
+        this.rolesController.loadRoles();
+      }
+    } else {
+      // For upcoming modules, keep previous view or notify
+      sectionDashboard?.classList.add('d-none');
+      sectionProjects?.classList.add('d-none');
+      sectionActivities?.classList.add('d-none');
+      sectionActors?.classList.add('d-none');
+      sectionRoles?.classList.add('d-none');
+      const moduleLabels = {
+        'resources': 'Recursos',
+        'audit': 'Auditoría'
+      };
+      NotificationService.info(`Módulo ${moduleLabels[moduleName] || moduleName} en preparación.`);
     }
   }
 
   initControllers() {
     this.projectsController = new ProjectsController();
 
+    this.actorsController = new ActorsController({
+      onActorChanged: () => {
+        if (this.dashboardController) {
+          this.dashboardController.refresh();
+        }
+      }
+    });
+
+    this.rolesController = new RolesController({
+      onRoleChanged: () => {
+        if (this.actorsController) {
+          this.actorsController.loadRolesOptions();
+        }
+      }
+    });
+
+    this.activitiesController = new ActivitiesController({
+      onActivityChanged: () => {
+        if (this.dashboardController) {
+          this.dashboardController.refresh();
+        }
+      }
+    });
+
     this.dashboardController = new DashboardController({
-      getCurrentUser: () => this.currentUser
+      onNavigateToProjects: (openModal = false) => {
+        this.navigateToModule('projects');
+        if (openModal && this.projectsController) {
+          this.projectsController.openCreateModal();
+        }
+      }
     });
 
     this.timerController = new TimerController({
@@ -115,11 +261,12 @@ class ChronosApp {
     });
 
     this.authController = new AuthController({
-      onAuthSuccess: (user, actor) => {
+      onAuthSuccess: async (user, actor) => {
         this.currentUser = user;
         this.currentActor = actor;
-        if (this.projectsController) {
-          this.projectsController.loadProjects();
+        this.navigateToModule('dashboard');
+        if (this.dashboardController) {
+          await this.dashboardController.refresh();
         }
       },
       onSignOut: () => {
@@ -142,13 +289,46 @@ class ChronosApp {
 
   async checkInitialSession() {
     try {
-      const user = await AuthService.getCurrentUser();
+      const rememberPref = localStorage.getItem('chronos_remember_session');
+
+      // If user previously unchecked "Mantener Iniciado", check if current browser session is active
+      if (rememberPref === 'false') {
+        const isSessionActive = sessionStorage.getItem('chronos_session_active');
+        if (!isSessionActive) {
+          // New window/tab and remember me was disabled: require credentials
+          await AuthService.signOut();
+          this.authController.updateUIForAnonymous();
+          return;
+        }
+      }
+
+      // Check for active Supabase session
+      let user = await AuthService.getCurrentUser();
+
+      // Fallback: If network lag or offline on mobile, but remember me is active and cache exists
+      if (!user && (rememberPref === 'true' || rememberPref === null)) {
+        try {
+          const cachedRaw = localStorage.getItem('chronos_cached_session');
+          if (cachedRaw) {
+            const cached = JSON.parse(cachedRaw);
+            if (cached?.user) {
+              user = { ...cached.user, actor: cached.actor };
+            }
+          }
+        } catch (e) {
+          console.warn('[Chronos] Cache restore error:', e);
+        }
+      }
+
       if (user) {
         this.currentUser = user;
         this.currentActor = user.actor;
         this.authController.handleSessionEstablished(user, user.actor);
-        if (this.projectsController) {
-          await this.projectsController.loadProjects();
+        
+        // Show dashboard as initial screen
+        this.navigateToModule('dashboard');
+        if (this.dashboardController) {
+          await this.dashboardController.refresh();
         }
       } else {
         this.authController.updateUIForAnonymous();

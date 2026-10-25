@@ -21,12 +21,22 @@ export class AuthService {
    */
   static async getCurrentUser() {
     const supabase = await getSupabase();
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) return null;
+    
+    // Check active session from storage first
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !sessionData?.session?.user) {
+      return null;
+    }
+
+    const user = sessionData.session.user;
 
     // Fetch actor profile and role if available
-    const actor = await this.getActorProfile(user.email);
-    return { ...user, actor };
+    try {
+      const actor = await this.getActorProfile(user.email);
+      return { ...user, actor };
+    } catch {
+      return user;
+    }
   }
 
   /**
@@ -53,8 +63,10 @@ export class AuthService {
    * Sign in using username or email along with password
    * @param {string} identifier Username or email
    * @param {string} password Password
+   * @param {Object} [options={}]
+   * @param {boolean} [options.rememberMe=true]
    */
-  static async signIn(identifier, password) {
+  static async signIn(identifier, password, { rememberMe = true } = {}) {
     const supabase = await getSupabase();
     let emailToUse = identifier.trim();
 
@@ -82,16 +94,35 @@ export class AuthService {
 
     // Attach actor details
     const actor = await this.getActorProfile(data.user.email);
-    return { ...data, actor };
+    const result = { ...data, actor };
+
+    // Persist or clear session preference based on "Mantener Iniciado"
+    if (rememberMe) {
+      localStorage.setItem('chronos_remember_session', 'true');
+      localStorage.setItem('chronos_cached_session', JSON.stringify({ user: data.user, actor }));
+    } else {
+      localStorage.setItem('chronos_remember_session', 'false');
+      sessionStorage.setItem('chronos_session_active', 'true');
+      localStorage.removeItem('chronos_cached_session');
+    }
+    localStorage.setItem('chronos_last_username', identifier.trim());
+
+    return result;
   }
 
   /**
-   * Sign out current user
+   * Sign out current user and clear persistent session flags
    */
   static async signOut() {
-    const supabase = await getSupabase();
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      const supabase = await getSupabase();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } finally {
+      localStorage.removeItem('chronos_remember_session');
+      localStorage.removeItem('chronos_cached_session');
+      sessionStorage.removeItem('chronos_session_active');
+    }
   }
 
   /**
