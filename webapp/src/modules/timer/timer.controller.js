@@ -5,6 +5,7 @@
 
 import { TimerService } from './timer.service.js';
 import { NotificationService } from '../../services/notification.service.js';
+import { NativeService } from '../../services/native.service.js';
 
 export class TimerController {
   constructor({ onEntrySaved, getCurrentUser }) {
@@ -51,6 +52,8 @@ export class TimerController {
     }
 
     this.isRunning = true;
+    NativeService.impact('light');
+
     this.intervalId = setInterval(() => {
       this.seconds++;
       this.render();
@@ -67,6 +70,7 @@ export class TimerController {
     this.intervalId = null;
     this.isRunning = false;
 
+    NativeService.impact('medium');
     this.updateControlsState();
     NotificationService.warning('Cronómetro pausado.');
   }
@@ -102,14 +106,22 @@ export class TimerController {
 
     try {
       const saved = await TimerService.saveEntry(payload);
+      NativeService.hapticNotification('success');
       NotificationService.success(`Registro guardado: ${TimerService.formatTime(duration)}`);
       
+      // Native local alert
+      NativeService.scheduleNotification({
+        title: 'Sesión Completada en Chronos',
+        body: `Guardado: "${taskTitle}" (${TimerService.formatTime(duration)})`
+      });
+
       this.reset();
 
       if (typeof this.onEntrySaved === 'function') {
         this.onEntrySaved(saved);
       }
     } catch (err) {
+      NativeService.hapticNotification('error');
       NotificationService.error('Error al guardar el registro de tiempo.');
     }
   }

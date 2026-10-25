@@ -1,0 +1,20 @@
+{
+  "appId": "com.project.chronos",
+  "appName": "Chronos",
+  "webDir": "webapp",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "plugins": {
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0A0D14"
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_chronos",
+      "iconColor": "#6366F1",
+      "sound": "beep.wav"
+    }
+  }
+}

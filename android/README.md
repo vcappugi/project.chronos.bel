@@ -1,31 +1,42 @@
-# Chronos - Módulo Android
+# Chronos - Módulo Android Híbrido (Capacitor / WebView)
 
-Este directorio contiene la arquitectura y estructura física para la vertiente **Android** del proyecto Chronos.
+Este directorio contiene el proyecto nativo Android generado y gestionado con **Capacitor**, integrando el núcleo de Chronos (HTML5, CSS moderno, ES Modules) con capacidades y acceso nativo al hardware del dispositivo.
 
-## 📁 Estructura Modular
+---
 
-```
-android/
-├── app/
-│   ├── src/
-│   │   └── main/
-│   │       ├── AndroidManifest.xml          # Permisos, actividades y servicios de Chronos
-│   │       ├── assets/
-│   │       │   └── config/
-│   │       │       └── supabase.config.json # Configuración encriptada (AES-GCM)
-│   │       ├── res/
-│   │       │   ├── values/                  # Strings, colores, temas
-│   │       │   └── layout/                  # Layouts XML principales
-│   │       └── modules/
-│   │           ├── auth/                    # Gestión de sesiones y tokens Supabase Auth
-│   │           ├── timer/                   # Lógica de cronómetro de alta precisión y foreground service
-│   │           ├── security/                # Desencriptado dinámico mediante Android Keystore / Cipher AES-GCM
-│   │           └── network/                 # Cliente HTTP y llamadas a la API REST/Realtime de Supabase
-└── config/
-    └── supabase.config.json                 # Copia de configuración encriptada de respaldo
-```
+## ⚡ Capacidades Nativas de Hardware Integradas
 
-## 🔒 Mecanismo de Seguridad y Desencriptado
-Al igual que en la vertiente web, las credenciales de Supabase se encuentran almacenadas de forma encriptada bajo el estándar **AES-GCM (256-bit)** con derivación de clave **PBKDF2**.
-- El módulo `security/` se encarga de leer el archivo `supabase.config.json` de `assets/` y desencriptar las credenciales en memoria en tiempo de ejecución.
-- Nunca se almacenan las llaves en texto plano en el repositorio.
+1. **Retroalimentación Háptica / Vibración (`@capacitor/haptics`)**:
+   - Resonancia táctil nativa al presionar botones (iniciar, pausar, reset).
+   - Patrón vibratorio de confirmación (`SUCCESS` / `ERROR`) al guardar registros de tiempo en Supabase.
+   - Permiso configurado en Android: `android.permission.VIBRATE`.
+
+2. **Notificaciones Locales y Alarmas (`@capacitor/local-notifications`)**:
+   - Notificaciones nativas en la barra de estado de Android al culminar tareas o intervalos.
+   - Permiso configurado en Android: `android.permission.POST_NOTIFICATIONS`.
+
+3. **Control de Barra de Estado y Tema (`@capacitor/status-bar`)**:
+   - Configuración de color `#0A0D14` y estilo de texto claro para armonizar con el tema oscuro de Chronos.
+
+4. **Ciclo de Vida y Botón Atrás (`@capacitor/app`)**:
+   - Intercepta el botón físico "Atrás" de Android para navegar entre pestañas en lugar de cerrar intempestivamente la app mientras el cronómetro esté activo.
+
+5. **Detección de Conectividad de Red (`@capacitor/network`)**:
+   - Monitoreo en tiempo real del estado de internet para activar el modo offline / online y sincronizar registros pendientes.
+
+---
+
+## 🚀 Comandos de Flujo de Trabajo
+
+* **Sincronizar cambios web con Android**:
+  ```bash
+  npm run cap:sync
+  ```
+* **Copiar archivos web a assets nativos**:
+  ```bash
+  npm run cap:copy
+  ```
+* **Abrir el proyecto en Android Studio**:
+  ```bash
+  npm run cap:open
+  ```

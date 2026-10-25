@@ -46,25 +46,19 @@ c:/xampp/htdocs/cronos/
 │       │   └── storage.service.js      # Almacenamiento local seguro de respaldo
 │       └── app.js                      # Orquestador principal y enrutador de tabs
 │
-└── android/                            # Vertiente Android
-    ├── README.md                       # Especificación de la app Android
-    ├── config/
-    │   └── supabase.config.json        # Configuración cifrada de respaldo
+└── android/                            # Vertiente Android Híbrida (Capacitor / WebView)
+    ├── README.md                       # Especificación de la app Android y hardware
+    ├── capacitor.settings.gradle       # Configuración de plugins Capacitor
+    ├── build.gradle                    # Configuración de construcción Gradle
     └── app/
         └── src/
             └── main/
-                ├── AndroidManifest.xml # Manifiesto de Android con permisos
-                ├── assets/
-                │   └── config/
-                │       └── supabase.config.json # Credenciales encriptadas para Android
-                ├── res/
-                │   ├── layout/         # Layout XML de la actividad principal
-                │   └── values/         # Strings, colores y estilos
-                └── modules/            # Módulos funcionales de Android
-                    ├── auth/           # Módulo de autenticación móvil
-                    ├── timer/          # Cronómetro móvil y Foreground Service
-                    ├── security/       # Motor de desencriptado AES-GCM en Android
-                    └── network/        # Cliente REST / Realtime de Supabase
+                ├── AndroidManifest.xml # Permisos nativos (Vibración, Notificaciones, Red)
+                ├── java/               # MainActivity de Android y puente Capacitor
+                ├── res/                # Recursos de la app nativa (iconos, temas)
+                └── assets/
+                    ├── capacitor.config.json # Configuración nativa del bridge
+                    └── public/         # Núcleo Web sincronizado automáticamente (HTML, CSS, JS, Vault)
 ```
 
 ---

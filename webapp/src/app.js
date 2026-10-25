@@ -9,6 +9,7 @@ import { AuthController } from './modules/auth/auth.controller.js';
 import { TimerController } from './modules/timer/timer.controller.js';
 import { DashboardController } from './modules/dashboard/dashboard.controller.js';
 import { NotificationService } from './services/notification.service.js';
+import { NativeService } from './services/native.service.js';
 
 class ChronosApp {
   constructor() {
@@ -19,10 +20,35 @@ class ChronosApp {
   async init() {
     console.log('[Chronos] Initializing application...');
 
+    // Initialize native device hardware features (Capacitor Bridge)
+    await NativeService.init();
+    this.setupNativeHardwareListeners();
+
     this.bindTabNavigation();
     this.initControllers();
     await this.initVaultAndSupabase();
     await this.checkInitialSession();
+  }
+
+  setupNativeHardwareListeners() {
+    // Android hardware Back Button navigation
+    NativeService.registerBackButton(() => {
+      if (this.activeTab !== 'timer') {
+        this.switchTab('timer');
+      }
+    });
+
+    // Device online/offline network connectivity listener
+    NativeService.onNetworkStatusChange((isOnline) => {
+      if (isOnline) {
+        NotificationService.success('Conexión reestablecida. Sincronizando con Supabase...');
+        if (this.dashboardController) {
+          this.dashboardController.refresh();
+        }
+      } else {
+        NotificationService.warning('Modo fuera de línea: los registros se guardarán en la memoria local.');
+      }
+    });
   }
 
   bindTabNavigation() {
@@ -30,6 +56,7 @@ class ChronosApp {
     tabButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         const targetTab = btn.getAttribute('data-tab');
+        NativeService.impact('light');
         this.switchTab(targetTab);
       });
     });
