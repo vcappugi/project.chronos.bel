@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chronos | Gestión y Registro de Tiempo de Alta Precisión</title>
+  <meta name="description" content="Chronos - Plataforma de alto rendimiento para el seguimiento y gestión de tiempo profesional con sincronización segura en Supabase.">
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets (Modular CSS Architecture) -->
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/modules/timer.css">
+  <link rel="stylesheet" href="./css/modules/dashboard.css">
+  <link rel="stylesheet" href="./css/modules/auth.css">
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header Navigation -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-logo" aria-hidden="true">⏱️</div>
+        <div>
+          <span class="brand-title">CHRONOS</span>
+          <span class="brand-badge">Web Edition</span>
+        </div>
+      </div>
+
+      <nav class="nav-tabs" aria-label="Navegación principal">
+        <button class="nav-tab-btn active" data-tab="timer" id="tab-btn-timer">
+          <span>⏱️</span> Cronómetro
+        </button>
+        <button class="nav-tab-btn" data-tab="dashboard" id="tab-btn-dashboard">
+          <span>📊</span> Dashboard
+        </button>
+        <button class="nav-tab-btn" data-tab="auth" id="tab-btn-auth">
+          <span>👤</span> Cuenta
+        </button>
+      </nav>
+
+      <div class="header-actions">
+        <div class="vault-status-indicator" title="Conexión encriptada con cifrado AES-GCM">
+          <span class="status-dot"></span>
+          <span id="vault-status-text">Cargando Vault...</span>
+        </div>
+
+        <div id="user-profile-pill" class="user-profile-pill hidden">
+          <div class="user-avatar-indicator">U</div>
+          <span id="user-email-text" class="user-email-label"></span>
+          <button id="sign-out-btn" class="btn btn-ghost btn-sm" title="Cerrar Sesión">Salir</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Views -->
+    <main class="app-main-content">
+
+      <!-- View 1: Timer / Cronómetro -->
+      <section id="view-timer" class="tab-view active">
+        <div class="timer-section-grid">
+          <div class="timer-display-card">
+            <div class="timer-status-badge">
+              <span id="timer-pulse-indicator" class="pulse-indicator"></span>
+              <span>Estado en Tiempo Real</span>
+            </div>
+
+            <!-- Big Glowing Digits -->
+            <div class="timer-digits-container" aria-live="polite">
+              <span id="timer-hours">00</span>
+              <span class="timer-separator">:</span>
+              <span id="timer-minutes">00</span>
+              <span class="timer-separator">:</span>
+              <span id="timer-seconds">00</span>
+            </div>
+
+            <!-- Inputs for activity & category -->
+            <div class="timer-inputs-bar">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="timer-task-input" class="form-label">¿En qué estás trabajando?</label>
+                <input 
+                  type="text" 
+                  id="timer-task-input" 
+                  class="form-input" 
+                  placeholder="Ej. Diseño de arquitectura móvil o Sprint 14..."
+                  autocomplete="off"
+                >
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="timer-category-select" class="form-label">Categoría / Proyecto</label>
+                <select id="timer-category-select" class="form-select">
+                  <option value="Desarrollo">💻 Desarrollo</option>
+                  <option value="Diseño UI/UX">🎨 Diseño UI/UX</option>
+                  <option value="Investigación">🔍 Investigación</option>
+                  <option value="Reuniones">👥 Reuniones</option>
+                  <option value="General">⚡ General</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="timer-controls">
+              <button id="timer-btn-start" class="btn btn-success">
+                <span>▶</span> Iniciar
+              </button>
+              <button id="timer-btn-pause" class="btn btn-warning" disabled>
+                <span>⏸</span> Pausar
+              </button>
+              <button id="timer-btn-stop" class="btn btn-primary" disabled>
+                <span>💾</span> Guardar Registro
+              </button>
+              <button id="timer-btn-reset" class="btn btn-secondary" disabled>
+                <span>↺</span> Reiniciar
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View 2: Dashboard / Métricas -->
+      <section id="view-dashboard" class="tab-view">
+        <!-- Metric Cards Grid -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-card-header">
+              <span class="metric-label">Tiempo Total</span>
+              <span class="metric-icon">⏳</span>
+            </div>
+            <div class="metric-value" id="stat-total-time">00:00:00</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-card-header">
+              <span class="metric-label">Registrado Hoy</span>
+              <span class="metric-icon">📅</span>
+            </div>
+            <div class="metric-value" id="stat-today-time">00:00:00</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-card-header">
+              <span class="metric-label">Sesiones Totales</span>
+              <span class="metric-icon">📈</span>
+            </div>
+            <div class="metric-value" id="stat-sessions-count">0</div>
+          </div>
+        </div>
+
+        <!-- Recent Records List -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Registros Recientes</h2>
+              <p class="card-description">Historial sincronizado con Supabase Cloud</p>
+            </div>
+          </div>
+
+          <div id="recent-entries-empty" class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p>Aún no hay registros de tiempo. ¡Inicia el cronómetro para comenzar!</p>
+          </div>
+
+          <div id="recent-entries-list" class="entries-container">
+            <!-- Dynamic entries will be inserted here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- View 3: Auth / Cuenta -->
+      <section id="view-auth" class="tab-view">
+        <div class="auth-view-wrapper">
+          <div class="auth-card">
+            <div class="auth-header">
+              <div class="auth-icon-badge">🔒</div>
+              <h2 id="auth-title">Iniciar Sesión</h2>
+              <p id="auth-subtitle">Ingresa tus credenciales para sincronizar tus datos</p>
+            </div>
+
+            <form id="auth-form">
+              <div class="form-group">
+                <label for="auth-email" class="form-label">Correo Electrónico</label>
+                <input 
+                  type="email" 
+                  id="auth-email" 
+                  class="form-input" 
+                  placeholder="usuario@ejemplo.com" 
+                  required
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="auth-password" class="form-label">Contraseña</label>
+                <input 
+                  type="password" 
+                  id="auth-password" 
+                  class="form-input" 
+                  placeholder="••••••••••••" 
+                  required
+                >
+              </div>
+
+              <div class="auth-actions">
+                <button type="submit" id="auth-submit-btn" class="btn btn-primary" style="width: 100%;">
+                  Acceder
+                </button>
+                <button type="button" id="auth-toggle-mode-btn" class="btn btn-ghost" style="width: 100%;">
+                  ¿No tienes cuenta? Regístrate aquí
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Main Application Script (ES Module) -->
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
