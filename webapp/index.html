@@ -26,7 +26,8 @@
   <div id="view-auth-login" class="login-wrapper">
     <div class="login-card">
       <div class="text-center mb-4">
-        <div class="login-brand-icon">⏱️</div>
+        <!-- Logo de la aplicación desde img/cronos.jpeg -->
+        <img src="./img/cronos.jpeg" alt="Logo Chronos" class="login-logo">
         <h1 class="login-brand-title">CHRONOS</h1>
         <p class="login-brand-subtitle">Control de Tiempo y Productividad</p>
       </div>
@@ -72,20 +73,12 @@
   <div id="app-main-workspace" class="d-none">
 
     <!-- Navbar Minimalista Yeti -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-4">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
       <div class="container">
         <span class="navbar-brand fw-bold d-flex align-items-center gap-2">
-          <span>⏱️</span> CHRONOS
+          <img src="./img/cronos.jpeg" alt="Logo Chronos" class="rounded" style="height: 28px; width: auto; object-fit: contain;">
+          CHRONOS
         </span>
-
-        <div class="d-flex align-items-center gap-2">
-          <button class="btn btn-sm btn-light nav-tab-btn active" data-tab="timer" id="tab-btn-timer">
-            ⏱️ Cronómetro
-          </button>
-          <button class="btn btn-sm btn-outline-light nav-tab-btn" data-tab="dashboard" id="tab-btn-dashboard">
-            📊 Dashboard
-          </button>
-        </div>
 
         <!-- Perfil de Usuario Minimalista -->
         <div id="user-profile-pill" class="d-flex align-items-center gap-2 text-white ms-auto">
@@ -98,128 +91,11 @@
       </div>
     </nav>
 
-    <!-- Contenedor Principal -->
-    <main class="container">
-
-      <!-- Vista 1: Cronómetro -->
-      <section id="view-timer" class="tab-view">
-        <div class="row justify-content-center">
-          <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mb-4">
-              <div class="card-body p-4 p-md-5 text-center">
-
-                <div class="mb-3">
-                  <span class="badge bg-light text-dark border py-2 px-3">
-                    <span id="timer-pulse-indicator" class="pulse-dot"></span>
-                    <span>Estado en Tiempo Real</span>
-                  </span>
-                </div>
-
-                <!-- Dígitos del Cronómetro -->
-                <div class="timer-digits" aria-live="polite">
-                  <span id="timer-hours">00</span>
-                  <span class="timer-separator">:</span>
-                  <span id="timer-minutes">00</span>
-                  <span class="timer-separator">:</span>
-                  <span id="timer-seconds">00</span>
-                </div>
-
-                <!-- Campos de Tarea y Categoría -->
-                <div class="row g-3 mb-4 text-start">
-                  <div class="col-md-8">
-                    <label for="timer-task-input" class="form-label fw-bold small text-muted">¿En qué estás trabajando?</label>
-                    <input 
-                      type="text" 
-                      id="timer-task-input" 
-                      class="form-control" 
-                      placeholder="Ej. Análisis de requerimientos o Sprint 14..."
-                      autocomplete="off"
-                    >
-                  </div>
-                  <div class="col-md-4">
-                    <label for="timer-category-select" class="form-label fw-bold small text-muted">Categoría</label>
-                    <select id="timer-category-select" class="form-select">
-                      <option value="Desarrollo">Desarrollo</option>
-                      <option value="Diseño UI/UX">Diseño UI/UX</option>
-                      <option value="Investigación">Investigación</option>
-                      <option value="Reuniones">Reuniones</option>
-                      <option value="General">General</option>
-                    </select>
-                  </div>
-                </div>
-
-                <!-- Botones de Control Yeti -->
-                <div class="d-flex flex-wrap justify-content-center gap-2">
-                  <button id="timer-btn-start" class="btn btn-success px-4 fw-bold">
-                    ▶ Iniciar
-                  </button>
-                  <button id="timer-btn-pause" class="btn btn-warning px-4 fw-bold" disabled>
-                    ⏸ Pausar
-                  </button>
-                  <button id="timer-btn-stop" class="btn btn-primary px-4 fw-bold" disabled>
-                    💾 Guardar Registro
-                  </button>
-                  <button id="timer-btn-reset" class="btn btn-secondary px-3" disabled>
-                    ↺ Reiniciar
-                  </button>
-                </div>
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Vista 2: Dashboard -->
-      <section id="view-dashboard" class="tab-view d-none">
-        <!-- Tarjetas Métricas Yeti -->
-        <div class="row g-3 mb-4">
-          <div class="col-md-4">
-            <div class="card border-0 shadow-sm text-center py-3">
-              <div class="card-body">
-                <span class="text-muted small fw-bold text-uppercase d-block mb-1">Tiempo Total</span>
-                <span class="fs-2 fw-bold text-primary font-monospace" id="stat-total-time">00:00:00</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-4">
-            <div class="card border-0 shadow-sm text-center py-3">
-              <div class="card-body">
-                <span class="text-muted small fw-bold text-uppercase d-block mb-1">Registrado Hoy</span>
-                <span class="fs-2 fw-bold text-success font-monospace" id="stat-today-time">00:00:00</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-4">
-            <div class="card border-0 shadow-sm text-center py-3">
-              <div class="card-body">
-                <span class="text-muted small fw-bold text-uppercase d-block mb-1">Sesiones Totales</span>
-                <span class="fs-2 fw-bold text-dark font-monospace" id="stat-sessions-count">0</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Lista de Registros Recientes -->
-        <div class="card border-0 shadow-sm">
-          <div class="card-header bg-white border-0 py-3">
-            <h5 class="card-title mb-0 fw-bold">Registros Recientes</h5>
-          </div>
-
-          <div id="recent-entries-empty" class="text-center py-5 text-muted">
-            <div class="fs-1 mb-2">📋</div>
-            <p class="mb-0">Aún no hay registros de tiempo. ¡Inicia el cronómetro para comenzar!</p>
-          </div>
-
-          <div id="recent-entries-list" class="list-group list-group-flush">
-            <!-- Registros dinámicos -->
-          </div>
-        </div>
-      </section>
-
+    <!-- Contenedor Principal (Espacio central en blanco por ahora) -->
+    <main class="container py-5" id="app-workspace-main">
+      <!-- Espacio central en blanco por ahora -->
     </main>
+
   </div>
 
   <!-- Contenedor para Notificaciones Toast -->
