@@ -3,220 +3,218 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chronos | Gestión y Registro de Tiempo de Alta Precisión</title>
-  <meta name="description" content="Chronos - Plataforma de alto rendimiento para el seguimiento y gestión de tiempo profesional con sincronización segura en Supabase.">
+  <title>Chronos | Gestión y Control de Tiempo</title>
+  <meta name="description" content="Chronos - Plataforma de alto rendimiento para el seguimiento y gestión de tiempo y productividad.">
 
   <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Stylesheets (Modular CSS Architecture) -->
-  <link rel="stylesheet" href="./css/variables.css">
-  <link rel="stylesheet" href="./css/base.css">
-  <link rel="stylesheet" href="./css/components.css">
-  <link rel="stylesheet" href="./css/modules/timer.css">
-  <link rel="stylesheet" href="./css/modules/dashboard.css">
-  <link rel="stylesheet" href="./css/modules/auth.css">
+  <!-- Yeti.css (Primary Framework) & Custom Styles -->
+  <link rel="stylesheet" href="./css/yeti.css">
+  <link rel="stylesheet" href="./css/chronos-custom.css">
 
-  <!-- Supabase JS Client -->
+  <!-- Supabase Library (Utilizada en segundo plano) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-  <div class="app-container">
-    <!-- Header Navigation -->
-    <header class="app-header">
-      <div class="brand-section">
-        <div class="brand-logo" aria-hidden="true">⏱️</div>
-        <div>
-          <span class="brand-title">CHRONOS</span>
-          <span class="brand-badge">Web Edition</span>
-        </div>
+  <!-- ======================================================== -->
+  <!-- 1. VISTA DE LOGIN INICIAL (MINIMALISTA)                   -->
+  <!-- ======================================================== -->
+  <div id="view-auth-login" class="login-wrapper">
+    <div class="login-card">
+      <div class="text-center mb-4">
+        <div class="login-brand-icon">⏱️</div>
+        <h1 class="login-brand-title">CHRONOS</h1>
+        <p class="login-brand-subtitle">Control de Tiempo y Productividad</p>
       </div>
 
-      <nav class="nav-tabs" aria-label="Navegación principal">
-        <button class="nav-tab-btn active" data-tab="timer" id="tab-btn-timer">
-          <span>⏱️</span> Cronómetro
-        </button>
-        <button class="nav-tab-btn" data-tab="dashboard" id="tab-btn-dashboard">
-          <span>📊</span> Dashboard
-        </button>
-        <button class="nav-tab-btn" data-tab="auth" id="tab-btn-auth">
-          <span>👤</span> Cuenta
-        </button>
-      </nav>
+      <div id="login-error-alert" class="alert alert-danger d-none py-2 px-3 small mb-3" role="alert"></div>
 
-      <div class="header-actions">
-        <div class="vault-status-indicator" title="Conexión encriptada con cifrado AES-GCM">
-          <span class="status-dot"></span>
-          <span id="vault-status-text">Cargando Vault...</span>
+      <form id="login-form" autocomplete="on">
+        <div class="mb-3">
+          <label for="login-username" class="form-label fw-bold small text-muted">Usuario</label>
+          <input 
+            type="text" 
+            id="login-username" 
+            class="form-control" 
+            placeholder="Usuario o correo" 
+            required 
+            autocomplete="username"
+            autofocus
+          >
         </div>
 
-        <div id="user-profile-pill" class="user-profile-pill hidden">
-          <div class="user-avatar-indicator">U</div>
-          <span id="user-email-text" class="user-email-label"></span>
-          <button id="sign-out-btn" class="btn btn-ghost btn-sm" title="Cerrar Sesión">Salir</button>
+        <div class="mb-4">
+          <label for="login-password" class="form-label fw-bold small text-muted">Clave</label>
+          <input 
+            type="password" 
+            id="login-password" 
+            class="form-control" 
+            placeholder="Contraseña" 
+            required 
+            autocomplete="current-password"
+          >
+        </div>
+
+        <button type="submit" id="login-submit-btn" class="btn btn-primary w-100 py-2 fw-bold">
+          Iniciar Sesión
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 2. ESPACIO DE TRABAJO PRINCIPAL (POST-AUTENTICACIÓN)      -->
+  <!-- ======================================================== -->
+  <div id="app-main-workspace" class="d-none">
+
+    <!-- Navbar Minimalista Yeti -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-4">
+      <div class="container">
+        <span class="navbar-brand fw-bold d-flex align-items-center gap-2">
+          <span>⏱️</span> CHRONOS
+        </span>
+
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-sm btn-light nav-tab-btn active" data-tab="timer" id="tab-btn-timer">
+            ⏱️ Cronómetro
+          </button>
+          <button class="btn btn-sm btn-outline-light nav-tab-btn" data-tab="dashboard" id="tab-btn-dashboard">
+            📊 Dashboard
+          </button>
+        </div>
+
+        <!-- Perfil de Usuario Minimalista -->
+        <div id="user-profile-pill" class="d-flex align-items-center gap-2 text-white ms-auto">
+          <span class="badge bg-secondary" id="user-role-badge">sysadmin</span>
+          <span id="user-name-text" class="fw-semibold small"></span>
+          <button id="sign-out-btn" class="btn btn-sm btn-outline-light ms-2" title="Cerrar Sesión">
+            Salir
+          </button>
         </div>
       </div>
-    </header>
+    </nav>
 
-    <!-- Main Content Views -->
-    <main class="app-main-content">
+    <!-- Contenedor Principal -->
+    <main class="container">
 
-      <!-- View 1: Timer / Cronómetro -->
-      <section id="view-timer" class="tab-view active">
-        <div class="timer-section-grid">
-          <div class="timer-display-card">
-            <div class="timer-status-badge">
-              <span id="timer-pulse-indicator" class="pulse-indicator"></span>
-              <span>Estado en Tiempo Real</span>
-            </div>
+      <!-- Vista 1: Cronómetro -->
+      <section id="view-timer" class="tab-view">
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+              <div class="card-body p-4 p-md-5 text-center">
 
-            <!-- Big Glowing Digits -->
-            <div class="timer-digits-container" aria-live="polite">
-              <span id="timer-hours">00</span>
-              <span class="timer-separator">:</span>
-              <span id="timer-minutes">00</span>
-              <span class="timer-separator">:</span>
-              <span id="timer-seconds">00</span>
-            </div>
+                <div class="mb-3">
+                  <span class="badge bg-light text-dark border py-2 px-3">
+                    <span id="timer-pulse-indicator" class="pulse-dot"></span>
+                    <span>Estado en Tiempo Real</span>
+                  </span>
+                </div>
 
-            <!-- Inputs for activity & category -->
-            <div class="timer-inputs-bar">
-              <div class="form-group" style="margin-bottom: 0;">
-                <label for="timer-task-input" class="form-label">¿En qué estás trabajando?</label>
-                <input 
-                  type="text" 
-                  id="timer-task-input" 
-                  class="form-input" 
-                  placeholder="Ej. Diseño de arquitectura móvil o Sprint 14..."
-                  autocomplete="off"
-                >
+                <!-- Dígitos del Cronómetro -->
+                <div class="timer-digits" aria-live="polite">
+                  <span id="timer-hours">00</span>
+                  <span class="timer-separator">:</span>
+                  <span id="timer-minutes">00</span>
+                  <span class="timer-separator">:</span>
+                  <span id="timer-seconds">00</span>
+                </div>
+
+                <!-- Campos de Tarea y Categoría -->
+                <div class="row g-3 mb-4 text-start">
+                  <div class="col-md-8">
+                    <label for="timer-task-input" class="form-label fw-bold small text-muted">¿En qué estás trabajando?</label>
+                    <input 
+                      type="text" 
+                      id="timer-task-input" 
+                      class="form-control" 
+                      placeholder="Ej. Análisis de requerimientos o Sprint 14..."
+                      autocomplete="off"
+                    >
+                  </div>
+                  <div class="col-md-4">
+                    <label for="timer-category-select" class="form-label fw-bold small text-muted">Categoría</label>
+                    <select id="timer-category-select" class="form-select">
+                      <option value="Desarrollo">Desarrollo</option>
+                      <option value="Diseño UI/UX">Diseño UI/UX</option>
+                      <option value="Investigación">Investigación</option>
+                      <option value="Reuniones">Reuniones</option>
+                      <option value="General">General</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Botones de Control Yeti -->
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                  <button id="timer-btn-start" class="btn btn-success px-4 fw-bold">
+                    ▶ Iniciar
+                  </button>
+                  <button id="timer-btn-pause" class="btn btn-warning px-4 fw-bold" disabled>
+                    ⏸ Pausar
+                  </button>
+                  <button id="timer-btn-stop" class="btn btn-primary px-4 fw-bold" disabled>
+                    💾 Guardar Registro
+                  </button>
+                  <button id="timer-btn-reset" class="btn btn-secondary px-3" disabled>
+                    ↺ Reiniciar
+                  </button>
+                </div>
+
               </div>
-
-              <div class="form-group" style="margin-bottom: 0;">
-                <label for="timer-category-select" class="form-label">Categoría / Proyecto</label>
-                <select id="timer-category-select" class="form-select">
-                  <option value="Desarrollo">💻 Desarrollo</option>
-                  <option value="Diseño UI/UX">🎨 Diseño UI/UX</option>
-                  <option value="Investigación">🔍 Investigación</option>
-                  <option value="Reuniones">👥 Reuniones</option>
-                  <option value="General">⚡ General</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Controls -->
-            <div class="timer-controls">
-              <button id="timer-btn-start" class="btn btn-success">
-                <span>▶</span> Iniciar
-              </button>
-              <button id="timer-btn-pause" class="btn btn-warning" disabled>
-                <span>⏸</span> Pausar
-              </button>
-              <button id="timer-btn-stop" class="btn btn-primary" disabled>
-                <span>💾</span> Guardar Registro
-              </button>
-              <button id="timer-btn-reset" class="btn btn-secondary" disabled>
-                <span>↺</span> Reiniciar
-              </button>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- View 2: Dashboard / Métricas -->
-      <section id="view-dashboard" class="tab-view">
-        <!-- Metric Cards Grid -->
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <div class="metric-card-header">
-              <span class="metric-label">Tiempo Total</span>
-              <span class="metric-icon">⏳</span>
+      <!-- Vista 2: Dashboard -->
+      <section id="view-dashboard" class="tab-view d-none">
+        <!-- Tarjetas Métricas Yeti -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center py-3">
+              <div class="card-body">
+                <span class="text-muted small fw-bold text-uppercase d-block mb-1">Tiempo Total</span>
+                <span class="fs-2 fw-bold text-primary font-monospace" id="stat-total-time">00:00:00</span>
+              </div>
             </div>
-            <div class="metric-value" id="stat-total-time">00:00:00</div>
           </div>
 
-          <div class="metric-card">
-            <div class="metric-card-header">
-              <span class="metric-label">Registrado Hoy</span>
-              <span class="metric-icon">📅</span>
+          <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center py-3">
+              <div class="card-body">
+                <span class="text-muted small fw-bold text-uppercase d-block mb-1">Registrado Hoy</span>
+                <span class="fs-2 fw-bold text-success font-monospace" id="stat-today-time">00:00:00</span>
+              </div>
             </div>
-            <div class="metric-value" id="stat-today-time">00:00:00</div>
           </div>
 
-          <div class="metric-card">
-            <div class="metric-card-header">
-              <span class="metric-label">Sesiones Totales</span>
-              <span class="metric-icon">📈</span>
+          <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center py-3">
+              <div class="card-body">
+                <span class="text-muted small fw-bold text-uppercase d-block mb-1">Sesiones Totales</span>
+                <span class="fs-2 fw-bold text-dark font-monospace" id="stat-sessions-count">0</span>
+              </div>
             </div>
-            <div class="metric-value" id="stat-sessions-count">0</div>
           </div>
         </div>
 
-        <!-- Recent Records List -->
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <h2 class="card-title">Registros Recientes</h2>
-              <p class="card-description">Historial sincronizado con Supabase Cloud</p>
-            </div>
+        <!-- Lista de Registros Recientes -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-0 py-3">
+            <h5 class="card-title mb-0 fw-bold">Registros Recientes</h5>
           </div>
 
-          <div id="recent-entries-empty" class="empty-state">
-            <div class="empty-state-icon">📋</div>
-            <p>Aún no hay registros de tiempo. ¡Inicia el cronómetro para comenzar!</p>
+          <div id="recent-entries-empty" class="text-center py-5 text-muted">
+            <div class="fs-1 mb-2">📋</div>
+            <p class="mb-0">Aún no hay registros de tiempo. ¡Inicia el cronómetro para comenzar!</p>
           </div>
 
-          <div id="recent-entries-list" class="entries-container">
-            <!-- Dynamic entries will be inserted here -->
-          </div>
-        </div>
-      </section>
-
-      <!-- View 3: Auth / Cuenta -->
-      <section id="view-auth" class="tab-view">
-        <div class="auth-view-wrapper">
-          <div class="auth-card">
-            <div class="auth-header">
-              <div class="auth-icon-badge">🔒</div>
-              <h2 id="auth-title">Iniciar Sesión</h2>
-              <p id="auth-subtitle">Ingresa tus credenciales para sincronizar tus datos</p>
-            </div>
-
-            <form id="auth-form">
-              <div class="form-group">
-                <label for="auth-email" class="form-label">Correo Electrónico</label>
-                <input 
-                  type="email" 
-                  id="auth-email" 
-                  class="form-input" 
-                  placeholder="usuario@ejemplo.com" 
-                  required
-                >
-              </div>
-
-              <div class="form-group">
-                <label for="auth-password" class="form-label">Contraseña</label>
-                <input 
-                  type="password" 
-                  id="auth-password" 
-                  class="form-input" 
-                  placeholder="••••••••••••" 
-                  required
-                >
-              </div>
-
-              <div class="auth-actions">
-                <button type="submit" id="auth-submit-btn" class="btn btn-primary" style="width: 100%;">
-                  Acceder
-                </button>
-                <button type="button" id="auth-toggle-mode-btn" class="btn btn-ghost" style="width: 100%;">
-                  ¿No tienes cuenta? Regístrate aquí
-                </button>
-              </div>
-            </form>
+          <div id="recent-entries-list" class="list-group list-group-flush">
+            <!-- Registros dinámicos -->
           </div>
         </div>
       </section>
@@ -224,7 +222,10 @@
     </main>
   </div>
 
-  <!-- Main Application Script (ES Module) -->
+  <!-- Contenedor para Notificaciones Toast -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Script Principal de la Aplicación -->
   <script type="module" src="./src/app.js"></script>
 </body>
 </html>

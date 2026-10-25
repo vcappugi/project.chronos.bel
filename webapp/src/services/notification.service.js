@@ -1,6 +1,6 @@
 /**
  * Project Chronos - Notification Service
- * Renders non-intrusive, animated toast notifications.
+ * Toast alerts styled with Yeti.css / Bootstrap alerts.
  */
 
 export class NotificationService {
@@ -21,32 +21,33 @@ export class NotificationService {
 
   /**
    * Displays a toast notification
-   * @param {string} message Message text
-   * @param {'info' | 'success' | 'warning' | 'error'} [type='info'] Notification type
-   * @param {number} [duration=4000] Duration in milliseconds
+   * @param {string} message 
+   * @param {'info' | 'success' | 'warning' | 'error'} [type='info'] 
+   * @param {number} [duration=3500] 
    */
-  static show(message, type = 'info', duration = 4000) {
+  static show(message, type = 'info', duration = 3500) {
     const container = this.#getContainer();
     const toast = document.createElement('div');
-    toast.className = `toast toast-${type} animate-fade-in`;
 
-    const iconMap = {
-      info: 'ℹ️',
-      success: '✅',
-      warning: '⚠️',
-      error: '❌'
+    const typeClassMap = {
+      info: 'alert-info',
+      success: 'alert-success',
+      warning: 'alert-warning',
+      error: 'alert-danger'
     };
 
+    const alertClass = typeClassMap[type] || 'alert-info';
+    toast.className = `alert ${alertClass} toast-alert fade show mb-0`;
+
     toast.innerHTML = `
-      <span class="toast-icon">${iconMap[type] || 'ℹ️'}</span>
-      <span class="toast-text">${message}</span>
-      <button class="toast-close" aria-label="Cerrar">&times;</button>
+      <span>${message}</span>
+      <button type="button" class="btn-close ms-2" aria-label="Cerrar"></button>
     `;
 
-    const closeBtn = toast.querySelector('.toast-close');
+    const closeBtn = toast.querySelector('.btn-close');
     const removeToast = () => {
-      toast.classList.add('animate-fade-out');
-      setTimeout(() => toast.remove(), 250);
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 200);
     };
 
     closeBtn.addEventListener('click', removeToast);

@@ -1,6 +1,6 @@
 /**
  * Project Chronos - Main Application Entrypoint
- * Bootstraps modules, coordinates tab routing, and initializes Supabase client.
+ * Bootstraps modules, coordinates tab routing, and initializes background services.
  */
 
 import { getDecryptedCredentials, getSupabase } from './config/supabase.client.js';
@@ -14,6 +14,7 @@ import { NativeService } from './services/native.service.js';
 class ChronosApp {
   constructor() {
     this.currentUser = null;
+    this.currentActor = null;
     this.activeTab = 'timer';
   }
 
@@ -41,7 +42,7 @@ class ChronosApp {
     // Device online/offline network connectivity listener
     NativeService.onNetworkStatusChange((isOnline) => {
       if (isOnline) {
-        NotificationService.success('Conexión reestablecida. Sincronizando con Supabase...');
+        NotificationService.success('Conexión reestablecida. Sincronizando datos...');
         if (this.dashboardController) {
           this.dashboardController.refresh();
         }
@@ -72,7 +73,7 @@ class ChronosApp {
 
     // Update tab views
     document.querySelectorAll('.tab-view').forEach(view => {
-      view.classList.toggle('active', view.id === `view-${tabName}`);
+      view.classList.toggle('d-none', view.id !== `view-${tabName}`);
     });
 
     // Hook refreshes
@@ -96,8 +97,9 @@ class ChronosApp {
     });
 
     this.authController = new AuthController({
-      onAuthSuccess: (user) => {
+      onAuthSuccess: (user, actor) => {
         this.currentUser = user;
+        this.currentActor = actor;
         this.switchTab('timer');
         if (this.dashboardController) {
           this.dashboardController.refresh();
@@ -105,6 +107,7 @@ class ChronosApp {
       },
       onSignOut: () => {
         this.currentUser = null;
+        this.currentActor = null;
         if (this.dashboardController) {
           this.dashboardController.refresh();
         }
@@ -113,22 +116,13 @@ class ChronosApp {
   }
 
   async initVaultAndSupabase() {
-    const statusText = document.getElementById('vault-status-text');
     try {
-      if (statusText) statusText.textContent = 'Desencriptando Vault...';
-      
-      // Decrypt credentials via Web Crypto AES-GCM
-      const creds = await getDecryptedCredentials();
-      console.log('[Chronos Vault] Credentials decrypted successfully for URL:', creds.supabaseUrl);
-
-      // Initialize Supabase instance
+      // Decrypt credentials in background via Web Crypto AES-GCM
+      await getDecryptedCredentials();
       await getSupabase();
-
-      if (statusText) statusText.textContent = 'Vault AES-GCM Activo';
     } catch (err) {
       console.error('[Chronos Vault Error]', err);
-      if (statusText) statusText.textContent = 'Error Vault';
-      NotificationService.error('Error al desencriptar las credenciales del sistema.');
+      NotificationService.error('Error al inicializar los servicios seguros del sistema.');
     }
   }
 
@@ -137,17 +131,18 @@ class ChronosApp {
       const user = await AuthService.getCurrentUser();
       if (user) {
         this.currentUser = user;
-        this.authController.handleSessionEstablished(user);
+        this.currentActor = user.actor;
+        this.authController.handleSessionEstablished(user, user.actor);
       } else {
         this.authController.updateUIForAnonymous();
       }
 
-      // Initial dashboard render
       if (this.dashboardController) {
         await this.dashboardController.refresh();
       }
     } catch (err) {
       console.warn('[Chronos] Session check fallback:', err);
+      this.authController.updateUIForAnonymous();
     }
   }
 }

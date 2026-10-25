@@ -1,6 +1,6 @@
 /**
- * Project Chronos - Auth Controller
- * Coordinates UI events with the Auth Service.
+ * Project Chronos - Minimalist Auth Controller
+ * Manages the initial login screen using Yeti.css form controls.
  */
 
 import { AuthService } from './auth.service.js';
@@ -10,21 +10,23 @@ export class AuthController {
   constructor({ onAuthSuccess, onSignOut }) {
     this.onAuthSuccess = onAuthSuccess;
     this.onSignOut = onSignOut;
-    this.isSignUpMode = false;
     this.initElements();
     this.bindEvents();
   }
 
   initElements() {
-    this.form = document.getElementById('auth-form');
-    this.title = document.getElementById('auth-title');
-    this.subtitle = document.getElementById('auth-subtitle');
-    this.submitBtn = document.getElementById('auth-submit-btn');
-    this.toggleBtn = document.getElementById('auth-toggle-mode-btn');
-    this.emailInput = document.getElementById('auth-email');
-    this.passwordInput = document.getElementById('auth-password');
+    this.loginContainer = document.getElementById('view-auth-login');
+    this.mainWorkspace = document.getElementById('app-main-workspace');
+
+    this.form = document.getElementById('login-form');
+    this.userInput = document.getElementById('login-username');
+    this.passwordInput = document.getElementById('login-password');
+    this.submitBtn = document.getElementById('login-submit-btn');
+    this.errorAlert = document.getElementById('login-error-alert');
+
     this.userPill = document.getElementById('user-profile-pill');
-    this.userEmailText = document.getElementById('user-email-text');
+    this.userNameText = document.getElementById('user-name-text');
+    this.userRoleBadge = document.getElementById('user-role-badge');
     this.signOutBtn = document.getElementById('sign-out-btn');
   }
 
@@ -33,59 +35,30 @@ export class AuthController {
       this.form.addEventListener('submit', (e) => this.handleSubmit(e));
     }
 
-    if (this.toggleBtn) {
-      this.toggleBtn.addEventListener('click', () => this.toggleMode());
-    }
-
     if (this.signOutBtn) {
       this.signOutBtn.addEventListener('click', () => this.handleSignOut());
     }
   }
 
-  toggleMode() {
-    this.isSignUpMode = !this.isSignUpMode;
-    if (this.isSignUpMode) {
-      this.title.textContent = 'Crear Cuenta';
-      this.subtitle.textContent = 'Regístrate para sincronizar tu tiempo en Chronos';
-      this.submitBtn.textContent = 'Registrarse';
-      this.toggleBtn.textContent = '¿Ya tienes cuenta? Inicia sesión';
-    } else {
-      this.title.textContent = 'Iniciar Sesión';
-      this.subtitle.textContent = 'Ingresa tus credenciales para continuar';
-      this.submitBtn.textContent = 'Acceder';
-      this.toggleBtn.textContent = '¿No tienes cuenta? Regístrate aquí';
-    }
-  }
-
   async handleSubmit(event) {
     event.preventDefault();
-    const email = this.emailInput.value.trim();
-    const password = this.passwordInput.value;
+    this.hideError();
 
-    if (!email || !password) {
-      NotificationService.warning('Por favor completa todos los campos.');
+    const username = this.userInput?.value?.trim();
+    const password = this.passwordInput?.value;
+
+    if (!username || !password) {
+      this.showError('Por favor ingresa tu usuario y clave.');
       return;
     }
 
     this.setLoading(true);
 
     try {
-      if (this.isSignUpMode) {
-        const data = await AuthService.signUp(email, password);
-        NotificationService.success('¡Registro exitoso! Revisa tu correo o inicia sesión.');
-        if (data.session) {
-          this.handleSessionEstablished(data.session.user);
-        } else {
-          this.toggleMode();
-        }
-      } else {
-        const data = await AuthService.signIn(email, password);
-        NotificationService.success('Sesión iniciada correctamente.');
-        this.handleSessionEstablished(data.user);
-      }
+      const result = await AuthService.signIn(username, password);
+      this.handleSessionEstablished(result.user, result.actor);
     } catch (err) {
-      console.error('[Auth Error]', err);
-      NotificationService.error(err.message || 'Error al autenticar.');
+      this.showError(err.message || 'Usuario o clave incorrectos.');
     } finally {
       this.setLoading(false);
     }
@@ -94,42 +67,82 @@ export class AuthController {
   async handleSignOut() {
     try {
       await AuthService.signOut();
-      NotificationService.info('Sesión cerrada.');
       this.updateUIForAnonymous();
       if (typeof this.onSignOut === 'function') {
         this.onSignOut();
       }
-    } catch (err) {
+    } catch {
       NotificationService.error('Error al cerrar sesión.');
     }
   }
 
-  handleSessionEstablished(user) {
-    if (this.userPill && this.userEmailText) {
-      this.userEmailText.textContent = user.email;
-      this.userPill.classList.remove('hidden');
+  handleSessionEstablished(user, actor = null) {
+    const displayName = actor ? `${actor.first_name} ${actor.last_name}` : user.email;
+    const roleName = actor?.roles?.name || 'Usuario';
+
+    if (this.userNameText) {
+      this.userNameText.textContent = displayName;
     }
+    if (this.userRoleBadge) {
+      this.userRoleBadge.textContent = roleName;
+    }
+
+    if (this.userPill) {
+      this.userPill.classList.remove('d-none');
+    }
+
+    // Hide login screen, display main application
+    if (this.loginContainer) {
+      this.loginContainer.classList.add('d-none');
+    }
+    if (this.mainWorkspace) {
+      this.mainWorkspace.classList.remove('d-none');
+    }
+
     if (this.form) {
       this.form.reset();
     }
+
     if (typeof this.onAuthSuccess === 'function') {
-      this.onAuthSuccess(user);
+      this.onAuthSuccess(user, actor);
     }
   }
 
   updateUIForAnonymous() {
     if (this.userPill) {
-      this.userPill.classList.add('hidden');
+      this.userPill.classList.add('d-none');
     }
-    if (this.userEmailText) {
-      this.userEmailText.textContent = '';
+    if (this.userNameText) {
+      this.userNameText.textContent = '';
+    }
+
+    // Show initial login screen, hide main application
+    if (this.loginContainer) {
+      this.loginContainer.classList.remove('d-none');
+    }
+    if (this.mainWorkspace) {
+      this.mainWorkspace.classList.add('d-none');
+    }
+  }
+
+  showError(message) {
+    if (this.errorAlert) {
+      this.errorAlert.textContent = message;
+      this.errorAlert.classList.remove('d-none');
+    }
+  }
+
+  hideError() {
+    if (this.errorAlert) {
+      this.errorAlert.textContent = '';
+      this.errorAlert.classList.add('d-none');
     }
   }
 
   setLoading(isLoading) {
     if (this.submitBtn) {
       this.submitBtn.disabled = isLoading;
-      this.submitBtn.classList.toggle('btn-loading', isLoading);
+      this.submitBtn.textContent = isLoading ? 'Accediendo...' : 'Iniciar Sesión';
     }
   }
 }
