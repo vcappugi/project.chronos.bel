@@ -99,6 +99,7 @@ export class ActorsService {
       phone: actorData.phone?.trim() || null,
       role_id: actorData.role_id || null,
       is_active: actorData.is_active !== undefined ? Boolean(actorData.is_active) : true,
+      acceso_actividades: actorData.acceso_actividades !== undefined ? Boolean(actorData.acceso_actividades) : false,
       updated_at: new Date().toISOString()
     };
 
@@ -137,6 +138,7 @@ export class ActorsService {
       phone: actorData.phone?.trim() || null,
       role_id: actorData.role_id || null,
       is_active: actorData.is_active !== undefined ? Boolean(actorData.is_active) : true,
+      acceso_actividades: actorData.acceso_actividades !== undefined ? Boolean(actorData.acceso_actividades) : false,
       updated_at: new Date().toISOString()
     };
 
@@ -169,7 +171,26 @@ export class ActorsService {
       throw new Error(error.message || 'Error al actualizar al colaborador.');
     }
 
-    return data?.[0];
+    const updatedActor = data?.[0];
+
+    // Sync cached session if the updated actor is the currently logged-in actor
+    try {
+      ['localStorage', 'sessionStorage'].forEach(storeKey => {
+        const storage = globalThis[storeKey];
+        const raw = storage?.getItem('chronos_cached_session');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed?.actor && (parsed.actor.id === id || parsed.actor.email?.toLowerCase() === payload.email)) {
+            parsed.actor = { ...parsed.actor, ...updatedActor };
+            storage.setItem('chronos_cached_session', JSON.stringify(parsed));
+          }
+        }
+      });
+    } catch {
+      // Ignore storage sync errors
+    }
+
+    return updatedActor;
   }
 
   /**

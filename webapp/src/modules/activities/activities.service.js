@@ -5,6 +5,7 @@
  */
 
 import { getSupabase } from '../../config/supabase.client.js';
+import { AuthService } from '../auth/auth.service.js';
 
 export class ActivitiesService {
   /**
@@ -23,7 +24,7 @@ export class ActivitiesService {
       .select(`
         *,
         proyectos(id, name),
-        actividad_actores(id),
+        actividad_actores(id, actor_id),
         actividad_recursos(id, quantity, unit_cost_usd_override, recursos(unit_cost_usd))
       `)
       .order('created_at', { ascending: false });
@@ -46,8 +47,23 @@ export class ActivitiesService {
       throw new Error('No se pudo cargar la lista de actividades.');
     }
 
+    // Filter by actor assignment if current actor has acceso_actividades === false
+    let rows = data || [];
+    try {
+      const currentUser = await AuthService.getCurrentUser();
+      const currentActor = currentUser?.actor;
+      if (currentActor?.id && currentActor.acceso_actividades === false) {
+        rows = rows.filter(act =>
+          Array.isArray(act.actividad_actores) &&
+          act.actividad_actores.some(aa => aa.actor_id === currentActor.id)
+        );
+      }
+    } catch {
+      // Fallback to unfiltered if session check fails
+    }
+
     // Compute aggregated actors count and total resource costs
-    return (data || []).map(act => {
+    return rows.map(act => {
       const actorsCount = Array.isArray(act.actividad_actores) ? act.actividad_actores.length : 0;
       
       let totalCostUSD = 0;
@@ -188,11 +204,29 @@ export class ActivitiesService {
       const supabase = await getSupabase();
       const { data, error } = await supabase
         .from('proyectos')
-        .select('id, name, status')
+        .select('id, name, status, actividades(id, actividad_actores(actor_id))')
         .order('name', { ascending: true });
 
       if (error) throw error;
-      return data || [];
+
+      let rows = data || [];
+      try {
+        const currentUser = await AuthService.getCurrentUser();
+        const currentActor = currentUser?.actor;
+        if (currentActor?.id && currentActor.acceso_actividades === false) {
+          rows = rows.filter(proj =>
+            Array.isArray(proj.actividades) &&
+            proj.actividades.some(act =>
+              Array.isArray(act.actividad_actores) &&
+              act.actividad_actores.some(aa => aa.actor_id === currentActor.id)
+            )
+          );
+        }
+      } catch {
+        // Fallback to unfiltered if session check fails
+      }
+
+      return rows;
     } catch (err) {
       console.error('[ActivitiesService] Error fetching projects list:', err);
       return [];

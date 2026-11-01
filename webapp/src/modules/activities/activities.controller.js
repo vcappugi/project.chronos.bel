@@ -172,9 +172,7 @@ export class ActivitiesController {
     this.setLoading(true);
 
     try {
-      if (this.projects.length === 0) {
-        await this.loadProjectsOptions();
-      }
+      await this.loadProjectsOptions();
 
       const projectId = this.filterProject?.value || '';
       const status = this.filterStatus?.value || '';

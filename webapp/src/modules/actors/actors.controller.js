@@ -44,6 +44,7 @@ export class ActorsController {
     this.inputPhone = document.getElementById('actor-phone');
     this.selectRoleId = document.getElementById('actor-role-id');
     this.selectIsActive = document.getElementById('actor-is-active');
+    this.selectAccesoActividades = document.getElementById('actor-acceso-actividades');
     this.inputPassword = document.getElementById('actor-password');
     this.inputPasswordConfirm = document.getElementById('actor-password-confirm');
     this.passwordHint = document.getElementById('actor-password-hint');
@@ -157,6 +158,9 @@ export class ActorsController {
       const statusBadge = actor.is_active 
         ? '<span class="badge bg-success px-2 py-1">Activo</span>'
         : '<span class="badge bg-light text-muted border px-2 py-1">Inactivo</span>';
+      const accesoBadge = actor.acceso_actividades
+        ? '<span class="badge bg-info text-dark border px-2 py-1" title="Acceso a todas las actividades">🌐 Todas</span>'
+        : '<span class="badge bg-light text-secondary border px-2 py-1" title="Solo acceso a actividades asignadas">👤 Asignadas</span>';
 
       return `
         <tr>
@@ -172,6 +176,7 @@ export class ActorsController {
                 <div class="actor-mobile-meta d-none">
                   ${roleBadge}
                   <span class="badge bg-light text-dark border font-monospace">⚡ ${activitiesCount} ${activitiesCount === 1 ? 'act.' : 'acts.'}</span>
+                  ${accesoBadge}
                   ${actor.phone ? `<span class="actor-mobile-phone">📞 ${this.escapeHtml(actor.phone)}</span>` : ''}
                 </div>
               </div>
@@ -183,9 +188,12 @@ export class ActorsController {
           <td class="td-actor-role">${roleBadge}</td>
           <td class="td-actor-status text-center">${statusBadge}</td>
           <td class="td-actor-activities">
-            <span class="badge bg-light text-dark border font-monospace">
-              ⚡ ${activitiesCount} ${activitiesCount === 1 ? 'actividad' : 'actividades'}
-            </span>
+            <div class="d-flex flex-wrap align-items-center gap-1">
+              <span class="badge bg-light text-dark border font-monospace">
+                ⚡ ${activitiesCount} ${activitiesCount === 1 ? 'actividad' : 'actividades'}
+              </span>
+              ${accesoBadge}
+            </div>
           </td>
           <td class="td-actor-actions text-end">
             <div class="btn-group btn-group-sm" role="group">
@@ -258,6 +266,7 @@ export class ActorsController {
     await this.loadRolesOptions();
 
     if (this.selectIsActive) this.selectIsActive.value = 'true';
+    if (this.selectAccesoActividades) this.selectAccesoActividades.value = 'false';
     if (this.selectRoleId && this.roles.length > 0) {
       // Default to colaborador if exists
       const colab = this.roles.find(r => r.name === 'colaborador');
@@ -283,6 +292,7 @@ export class ActorsController {
     if (this.inputPhone) this.inputPhone.value = actor.phone || '';
     if (this.selectRoleId) this.selectRoleId.value = actor.role_id || '';
     if (this.selectIsActive) this.selectIsActive.value = String(actor.is_active);
+    if (this.selectAccesoActividades) this.selectAccesoActividades.value = String(Boolean(actor.acceso_actividades));
     if (this.inputPassword) this.inputPassword.value = '';
     if (this.inputPasswordConfirm) this.inputPasswordConfirm.value = '';
     if (this.passwordLabel) this.passwordLabel.textContent = 'Nueva Clave';
@@ -301,6 +311,7 @@ export class ActorsController {
     const roleId = this.selectRoleId?.value;
     const phone = this.inputPhone?.value?.trim() || null;
     const isActive = this.selectIsActive?.value === 'true';
+    const accesoActividades = this.selectAccesoActividades?.value === 'true';
     const password = this.inputPassword?.value || '';
     const passwordConfirm = this.inputPasswordConfirm?.value || '';
 
@@ -340,7 +351,8 @@ export class ActorsController {
       email,
       phone,
       role_id: roleId,
-      is_active: isActive
+      is_active: isActive,
+      acceso_actividades: accesoActividades
     };
 
     if (password) {

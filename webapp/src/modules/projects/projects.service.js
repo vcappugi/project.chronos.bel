@@ -4,6 +4,7 @@
  */
 
 import { getSupabase } from '../../config/supabase.client.js';
+import { AuthService } from '../auth/auth.service.js';
 
 export class ProjectsService {
   /**
@@ -18,7 +19,7 @@ export class ProjectsService {
 
     let req = supabase
       .from('proyectos')
-      .select('*')
+      .select('*, actividades(id, actividad_actores(actor_id))')
       .order('created_at', { ascending: false });
 
     if (status) {
@@ -35,7 +36,24 @@ export class ProjectsService {
       throw new Error('No se pudo cargar la lista de proyectos.');
     }
 
-    return data || [];
+    let rows = data || [];
+    try {
+      const currentUser = await AuthService.getCurrentUser();
+      const currentActor = currentUser?.actor;
+      if (currentActor?.id && currentActor.acceso_actividades === false) {
+        rows = rows.filter(proj =>
+          Array.isArray(proj.actividades) &&
+          proj.actividades.some(act =>
+            Array.isArray(act.actividad_actores) &&
+            act.actividad_actores.some(aa => aa.actor_id === currentActor.id)
+          )
+        );
+      }
+    } catch {
+      // Fallback to unfiltered if session check fails
+    }
+
+    return rows;
   }
 
   /**

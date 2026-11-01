@@ -4,6 +4,7 @@
  */
 
 import { getSupabase } from '../../config/supabase.client.js';
+import { AuthService } from '../auth/auth.service.js';
 
 export class DashboardService {
   /**
@@ -21,22 +22,24 @@ export class DashboardService {
         projectsResult,
         activitiesResult,
         actorsResult,
-        summaryResult
+        summaryResult,
+        currentUserResult
       ] = await Promise.allSettled([
         supabase.from('proyectos').select('*').order('created_at', { ascending: false }),
         supabase
           .from('actividades')
           .select('id, project_id, name, description, weight, progress_percentage, start_date, end_date, status, created_at, proyectos(id, name), actividad_actores(actor_id)')
           .order('start_date', { ascending: true, nullsFirst: false }),
-        supabase.from('actores').select('id, first_name, last_name, is_active'),
-        supabase.from('vw_proyecto_resumen').select('*')
+        supabase.from('actores').select('id, first_name, last_name, email, is_active, acceso_actividades'),
+        supabase.from('vw_proyecto_resumen').select('*'),
+        AuthService.getCurrentUser()
       ]);
 
-      const allProjects = projectsResult.status === 'fulfilled' && !projectsResult.value.error 
+      const rawProjects = projectsResult.status === 'fulfilled' && !projectsResult.value.error 
         ? (projectsResult.value.data || []) 
         : [];
 
-      const allActivities = activitiesResult.status === 'fulfilled' && !activitiesResult.value.error 
+      const rawActivities = activitiesResult.status === 'fulfilled' && !activitiesResult.value.error 
         ? (activitiesResult.value.data || []) 
         : [];
 
@@ -48,13 +51,35 @@ export class DashboardService {
         ? (summaryResult.value.data || []) 
         : [];
 
+      const currentUser = currentUserResult.status === 'fulfilled' ? currentUserResult.value : null;
+      const currentActor = currentUser?.actor || (currentUser?.email
+        ? actors.find(a => a.email?.toLowerCase() === currentUser.email.toLowerCase())
+        : null);
+
+      // Apply acceso_actividades restriction when actor does not have full access
+      let allActivities = rawActivities;
+      let allProjects = rawProjects;
+
+      if (currentActor?.id && currentActor.acceso_actividades === false) {
+        allActivities = rawActivities.filter(act =>
+          Array.isArray(act.actividad_actores) &&
+          act.actividad_actores.some(aa => aa.actor_id === currentActor.id)
+        );
+        const assignedProjectIds = new Set(allActivities.map(a => a.project_id).filter(Boolean));
+        allProjects = rawProjects.filter(p => assignedProjectIds.has(p.id));
+      }
+
+      const effectiveProjectId = projectId && allProjects.some(p => p.id === projectId)
+        ? projectId
+        : '';
+
       // Filter by projectId if selected
-      const projects = projectId
-        ? allProjects.filter(p => p.id === projectId)
+      const projects = effectiveProjectId
+        ? allProjects.filter(p => p.id === effectiveProjectId)
         : allProjects;
 
-      const activities = projectId
-        ? allActivities.filter(a => a.project_id === projectId)
+      const activities = effectiveProjectId
+        ? allActivities.filter(a => a.project_id === effectiveProjectId)
         : allActivities;
 
       // Map summaries by project ID for quick lookup

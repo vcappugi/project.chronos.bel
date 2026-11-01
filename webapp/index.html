@@ -18,13 +18,13 @@
 
   <!-- Yeti.css (Primary Framework) & Custom Styles -->
   <link rel="stylesheet" href="./css/yeti.css">
-  <link rel="stylesheet" href="./css/chronos-custom.css?v=mobile7">
-  <link rel="stylesheet" href="./css/modules/projects.css?v=mobile7">
-  <link rel="stylesheet" href="./css/modules/dashboard.css?v=mobile7">
-  <link rel="stylesheet" href="./css/modules/activities.css?v=mobile7">
-  <link rel="stylesheet" href="./css/modules/actors.css?v=mobile7">
-  <link rel="stylesheet" href="./css/modules/roles.css?v=mobile7">
-  <link rel="stylesheet" href="./css/modules/resources.css?v=mobile7">
+  <link rel="stylesheet" href="./css/chronos-custom.css?v=mobile9">
+  <link rel="stylesheet" href="./css/modules/projects.css?v=mobile9">
+  <link rel="stylesheet" href="./css/modules/dashboard.css?v=mobile9">
+  <link rel="stylesheet" href="./css/modules/activities.css?v=mobile9">
+  <link rel="stylesheet" href="./css/modules/actors.css?v=mobile9">
+  <link rel="stylesheet" href="./css/modules/roles.css?v=mobile9">
+  <link rel="stylesheet" href="./css/modules/resources.css?v=mobile9">
 
   <!-- Supabase Library (Utilizada en segundo plano) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1417,6 +1417,16 @@
               </div>
             </div>
 
+            <div class="row g-3 mb-3">
+              <div class="col-12">
+                <label for="actor-acceso-actividades" class="form-label fw-bold small text-muted">Acceso a Actividades (<code>acceso_actividades</code>)</label>
+                <select class="form-select" id="actor-acceso-actividades" name="acceso_actividades">
+                  <option value="false">Solo a las actividades asignadas</option>
+                  <option value="true">Acceso a todas las actividades</option>
+                </select>
+              </div>
+            </div>
+
             <!-- Campos de Clave / Contraseña del Usuario -->
             <div class="pt-3 border-top">
               <div class="d-flex justify-content-between align-items-center mb-2">
@@ -1656,6 +1666,6 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Script Principal de la Aplicación -->
-  <script type="module" src="./src/app.js?v=mobile7"></script>
+  <script type="module" src="./src/app.js?v=mobile9"></script>
 </body>
 </html>

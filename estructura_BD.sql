@@ -46,7 +46,8 @@ CREATE TABLE public.actores (
     last_name VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(50),
-    password_hash VARCHAR(255), -- Contraseña encriptada (bcrypt / pgcrypto)
+    password_hash VARCHAR(255), -- Contraseña encriptada (bcrypt / pgcrypto / sha256)
+    acceso_actividades BOOLEAN DEFAULT FALSE NOT NULL, -- TRUE: todas las actividades, FALSE: solo asignadas
     is_active BOOLEAN DEFAULT TRUE NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()

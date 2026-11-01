@@ -54,6 +54,20 @@ export class AuthService {
       if (cachedRaw) {
         const cached = JSON.parse(cachedRaw);
         if (cached?.user) {
+          const emailToLookup = cached.actor?.email || cached.user?.email;
+          if (emailToLookup) {
+            const freshActor = await this.getActorProfile(emailToLookup);
+            if (freshActor) {
+              cached.actor = freshActor;
+              const updatedPayload = JSON.stringify(cached);
+              if (localStorage.getItem('chronos_cached_session')) {
+                localStorage.setItem('chronos_cached_session', updatedPayload);
+              }
+              if (sessionStorage.getItem('chronos_cached_session')) {
+                sessionStorage.setItem('chronos_cached_session', updatedPayload);
+              }
+            }
+          }
           return { ...cached.user, actor: cached.actor };
         }
       }
@@ -73,7 +87,7 @@ export class AuthService {
       const supabase = await getSupabase();
       const { data, error } = await supabase
         .from('actores')
-        .select('id, first_name, last_name, email, role_id, is_active, password_hash, roles(name, description)')
+        .select('id, first_name, last_name, email, role_id, is_active, acceso_actividades, password_hash, roles(name, description)')
         .eq('email', email)
         .maybeSingle();
 
