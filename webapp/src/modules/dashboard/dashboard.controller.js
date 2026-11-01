@@ -168,14 +168,14 @@ export class DashboardController {
 
       return `
         <tr>
-          <td>
+          <td class="td-dash-name">
             <div class="fw-bold text-dark">${this.escapeHtml(proj.name)}</div>
-            <div class="text-muted small text-truncate" style="max-width: 280px;">${this.escapeHtml(proj.description || 'Sin descripción')}</div>
+            <div class="text-muted small text-truncate dash-proj-desc" style="max-width: 280px;">${this.escapeHtml(proj.description || 'Sin descripción')}</div>
           </td>
-          <td>${statusBadge}</td>
-          <td>
+          <td class="td-dash-status text-center">${statusBadge}</td>
+          <td class="td-dash-progress">
             <div class="d-flex align-items-center gap-2">
-              <div class="table-progress-box flex-grow-1">
+              <div class="table-progress-box flex-grow-1 d-none d-sm-block">
                 <div class="table-progress-bar">
                   <div class="table-progress-fill ${progressColor}" style="width: ${progress}%"></div>
                 </div>
@@ -183,10 +183,10 @@ export class DashboardController {
               <span class="small fw-bold font-monospace text-dark">${progress}%</span>
             </div>
           </td>
-          <td>
+          <td class="td-dash-spent dash-proj-spent">
             <span class="font-monospace small fw-bold text-dark">$${spentUSD}</span>
           </td>
-          <td class="text-end">
+          <td class="td-dash-action text-end">
             <button class="btn btn-sm btn-outline-primary py-0.5 px-2 btn-dash-manage" data-id="${proj.id}">
               Ver →
             </button>

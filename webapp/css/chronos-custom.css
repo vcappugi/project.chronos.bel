@@ -127,6 +127,14 @@ body {
   100% { transform: scale(1); opacity: 0.8; }
 }
 
+/* Clickable row titles for opening edit modals */
+a.act-row-name:hover,
+a.project-row-name:hover,
+a.btn-edit-actor:hover,
+a.res-row-title:hover {
+  text-decoration: underline !important;
+}
+
 /* Toast Notifications */
 .toast-container {
   position: fixed;
@@ -151,3 +159,98 @@ body {
   align-items: center;
   justify-content: space-between;
 }
+
+/* ========================================================================== */
+/* Mobile Web & Android: Viewport Layout Adjustments & Zero Horizontal Scroll */
+/* ========================================================================== */
+@media (max-width: 768px), (max-device-width: 768px) {
+  #app-workspace-main,
+  .is-mobile-device #app-workspace-main {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    padding-top: 0.75rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+
+  .navbar .container-fluid,
+  .is-mobile-device .navbar .container-fluid {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  /* Evita el scroll horizontal en contenedores de tablas en móvil */
+  .table-responsive,
+  .is-mobile-device .table-responsive {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+
+  /* Dashboard Projects Table Compact */
+  #dashboard-projects-table,
+  .is-mobile-device #dashboard-projects-table {
+    table-layout: fixed;
+    width: 100% !important;
+  }
+
+  #dashboard-projects-table th.th-dash-name,
+  .is-mobile-device #dashboard-projects-table th.th-dash-name {
+    width: 50% !important;
+    font-size: 0.72rem !important;
+    padding: 0.45rem 0.35rem !important;
+  }
+
+  #dashboard-projects-table th.th-dash-status,
+  .is-mobile-device #dashboard-projects-table th.th-dash-status {
+    width: 25% !important;
+    font-size: 0.72rem !important;
+    padding: 0.45rem 0.25rem !important;
+    text-align: center !important;
+  }
+
+  #dashboard-projects-table th.th-dash-progress,
+  .is-mobile-device #dashboard-projects-table th.th-dash-progress {
+    width: 25% !important;
+    font-size: 0.72rem !important;
+    padding: 0.45rem 0.25rem !important;
+    text-align: end !important;
+  }
+
+  #dashboard-projects-table th.th-dash-spent,
+  #dashboard-projects-table th.th-dash-action,
+  .is-mobile-device #dashboard-projects-table th.th-dash-spent,
+  .is-mobile-device #dashboard-projects-table th.th-dash-action {
+    display: none !important;
+  }
+
+  #dash-projects-table-body td.td-dash-name,
+  .is-mobile-device #dash-projects-table-body td.td-dash-name {
+    width: 50% !important;
+    padding: 0.45rem 0.35rem !important;
+  }
+
+  #dash-projects-table-body td.td-dash-status,
+  .is-mobile-device #dash-projects-table-body td.td-dash-status {
+    width: 25% !important;
+    padding: 0.45rem 0.25rem !important;
+    text-align: center !important;
+  }
+
+  #dash-projects-table-body td.td-dash-progress,
+  .is-mobile-device #dash-projects-table-body td.td-dash-progress {
+    width: 25% !important;
+    padding: 0.45rem 0.25rem !important;
+    text-align: end !important;
+  }
+
+  #dash-projects-table-body td.td-dash-spent,
+  #dash-projects-table-body td.td-dash-action,
+  .is-mobile-device #dash-projects-table-body td.td-dash-spent,
+  .is-mobile-device #dash-projects-table-body td.td-dash-action {
+    display: none !important;
+  }
+
+  .dash-proj-desc {
+    display: none !important;
+  }
+}
+

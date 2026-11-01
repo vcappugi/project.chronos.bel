@@ -18,12 +18,13 @@
 
   <!-- Yeti.css (Primary Framework) & Custom Styles -->
   <link rel="stylesheet" href="./css/yeti.css">
-  <link rel="stylesheet" href="./css/chronos-custom.css">
-  <link rel="stylesheet" href="./css/modules/projects.css">
-  <link rel="stylesheet" href="./css/modules/dashboard.css">
-  <link rel="stylesheet" href="./css/modules/activities.css">
-  <link rel="stylesheet" href="./css/modules/actors.css">
-  <link rel="stylesheet" href="./css/modules/roles.css">
+  <link rel="stylesheet" href="./css/chronos-custom.css?v=mobile4">
+  <link rel="stylesheet" href="./css/modules/projects.css?v=mobile4">
+  <link rel="stylesheet" href="./css/modules/dashboard.css?v=mobile4">
+  <link rel="stylesheet" href="./css/modules/activities.css?v=mobile4">
+  <link rel="stylesheet" href="./css/modules/actors.css?v=mobile4">
+  <link rel="stylesheet" href="./css/modules/roles.css?v=mobile4">
+  <link rel="stylesheet" href="./css/modules/resources.css?v=mobile4">
 
   <!-- Supabase Library (Utilizada en segundo plano) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -369,14 +370,14 @@
               </div>
 
               <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+                <table class="table table-hover align-middle mb-0" id="dashboard-projects-table">
                   <thead class="table-light text-uppercase small fw-bold">
                     <tr>
-                      <th style="min-width: 240px;">Proyecto</th>
-                      <th style="width: 140px;">Estado</th>
-                      <th style="width: 180px;">Progreso Estimado</th>
-                      <th style="width: 130px;">Inversión</th>
-                      <th class="text-end" style="width: 100px;">Acción</th>
+                      <th class="th-dash-name">Proyecto</th>
+                      <th class="th-dash-status text-center">Estado</th>
+                      <th class="th-dash-progress">Progreso Estimado</th>
+                      <th class="th-dash-spent">Inversión</th>
+                      <th class="th-dash-action text-end">Acción</th>
                     </tr>
                   </thead>
                   <tbody id="dash-projects-table-body">
@@ -481,13 +482,13 @@
 
         <!-- Tabla de Proyectos (Yeti.css) -->
         <div class="table-responsive">
-          <table class="table table-hover table-striped align-middle mb-0">
+          <table class="table table-hover table-striped align-middle mb-0" id="projects-main-table">
             <thead class="table-light text-uppercase small fw-bold">
               <tr>
-                <th style="min-width: 280px;">Proyecto y Descripción</th>
-                <th style="width: 160px;">Estado</th>
-                <th style="width: 220px;">Plazos (Inicio / Fin)</th>
-                <th class="text-end" style="width: 140px;">Acciones</th>
+                <th class="th-project-info">Proyecto</th>
+                <th class="th-project-status text-center">Estado</th>
+                <th class="th-project-dates">Plazos (Inicio / Fin)</th>
+                <th class="th-project-actions text-end">Acciones</th>
               </tr>
             </thead>
             <tbody id="projects-table-body">
@@ -558,14 +559,14 @@
 
         <!-- Tabla de Actividades (Yeti.css) -->
         <div class="table-responsive">
-          <table class="table table-hover table-striped align-middle mb-0">
+          <table class="table table-hover table-striped align-middle mb-0" id="activities-main-table">
             <thead class="table-light text-uppercase small fw-bold">
               <tr>
-                <th style="min-width: 280px;">Actividad y Proyecto</th>
-                <th style="width: 150px;">Estado</th>
-                <th style="width: 200px;">Avance y Ponderación</th>
-                <th style="width: 200px;">Plazos (Inicio / Fin)</th>
-                <th class="text-end" style="width: 140px;">Acciones</th>
+                <th class="th-act-info">Actividad y Proyecto</th>
+                <th class="th-act-status text-center">Estado</th>
+                <th class="th-act-progress">Avance</th>
+                <th class="th-act-dates">Plazos (Inicio / Fin)</th>
+                <th class="th-act-actions text-end">Acciones</th>
               </tr>
             </thead>
             <tbody id="activities-table-body">
@@ -579,6 +580,84 @@
           <div class="fs-1 mb-2">⚡</div>
           <h4 class="h5 fw-bold text-dark">No hay actividades registradas</h4>
           <p class="text-muted small mb-0">Comienza haciendo clic en el botón <strong>"Nueva Actividad"</strong>.</p>
+        </div>
+
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- CRUD DE RECURSOS E INSUMOS (A TODO EL ANCHO)         -->
+      <!-- ==================================================== -->
+      <section id="section-resources-crud" class="card border-0 shadow-sm d-none resources-view">
+        
+        <!-- Header del Módulo -->
+        <div class="card-header bg-white py-3 border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <h3 class="h4 mb-0 fw-bold text-dark">Catálogo de Recursos e Insumos</h3>
+            <span id="resources-count-badge" class="badge bg-secondary">0 recursos</span>
+            <div id="resources-loading" class="spinner-border spinner-border-sm text-primary d-none" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+          <button id="btn-new-resource" class="btn btn-primary fw-bold shadow-sm">
+            <span class="me-1">➕</span> Nuevo Recurso
+          </button>
+        </div>
+
+        <!-- Barra de Búsqueda y Filtros -->
+        <div class="card-body border-top border-bottom py-3 bg-light">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-6 col-lg-6">
+              <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">🔍</span>
+                <input 
+                  type="text" 
+                  id="resource-search-input" 
+                  class="form-control border-start-0" 
+                  placeholder="Buscar por nombre de recurso..."
+                  autocomplete="off"
+                >
+              </div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+              <select id="resource-filter-unit-type" class="form-select">
+                <option value="">Todas las unidades</option>
+                <option value="HORA">HORA</option>
+                <option value="UNIDAD">UNIDAD</option>
+                <option value="GLOBAL">GLOBAL</option>
+                <option value="SERVICIO">SERVICIO</option>
+                <option value="DIA">DIA</option>
+                <option value="MES">MES</option>
+                <option value="METRO">METRO</option>
+                <option value="KG">KG</option>
+                <option value="LITRO">LITRO</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Recursos -->
+        <div class="table-responsive">
+          <table id="resources-main-table" class="table table-hover table-striped align-middle mb-0">
+            <thead class="table-light text-uppercase small fw-bold">
+              <tr>
+                <th class="th-res-name" scope="col">Recurso</th>
+                <th class="th-res-type text-center" scope="col">Unidad</th>
+                <th class="th-res-cost text-center" scope="col">Costo Unitario USD</th>
+                <th class="th-res-usage text-center" scope="col">Uso en Actividades</th>
+                <th class="th-res-actions text-end" scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="resources-table-body">
+              <!-- Filas generadas dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Estado Vacío -->
+        <div id="resources-empty-state" class="text-center py-5 d-none">
+          <div class="fs-1 mb-2">📦</div>
+          <h4 class="h5 fw-bold text-dark">No hay recursos registrados</h4>
+          <p class="text-muted small mb-0">Comienza haciendo clic en el botón <strong>"Nuevo Recurso"</strong>.</p>
         </div>
 
       </section>
@@ -906,7 +985,7 @@
               </div>
             </div>
 
-            <div class="mb-2">
+            <div class="mb-3">
               <label for="activity-status" class="form-label fw-bold small text-muted">Estado de la Actividad</label>
               <select class="form-select" id="activity-status">
                 <option value="PENDIENTE">Pendiente</option>
@@ -914,6 +993,35 @@
                 <option value="SUSPENDIDA">Suspendida</option>
                 <option value="FINALIZADA">Finalizada</option>
               </select>
+            </div>
+
+            <!-- Opciones de Participantes y Costos -->
+            <div class="pt-3 border-top">
+              <label class="form-label fw-bold small text-muted d-block mb-2">Participantes y Costos</label>
+              <div class="row g-2">
+                <div class="col-sm-6">
+                  <button
+                    type="button"
+                    id="btn-modal-act-actors"
+                    class="btn btn-outline-info w-100 py-2 px-3 d-flex align-items-center justify-content-between"
+                    title="Gestionar participantes de esta actividad"
+                  >
+                    <span class="fw-bold">👥 Participantes</span>
+                    <span class="badge bg-info text-dark" id="modal-act-actors-badge">0 actores</span>
+                  </button>
+                </div>
+                <div class="col-sm-6">
+                  <button
+                    type="button"
+                    id="btn-modal-act-resources"
+                    class="btn btn-outline-success w-100 py-2 px-3 d-flex align-items-center justify-content-between"
+                    title="Gestionar recursos y costos de esta actividad"
+                  >
+                    <span class="fw-bold">💵 Costos</span>
+                    <span class="badge bg-success font-monospace" id="modal-act-resources-badge">$0.00</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1071,9 +1179,8 @@
                   type="number" 
                   class="form-control form-control-sm" 
                   id="input-assign-res-qty" 
-                  value="1.00" 
-                  step="0.05" 
-                  min="0.01" 
+                  value="1" 
+                  step="any" 
                   required
                 >
               </div>
@@ -1312,10 +1419,111 @@
     </div>
   </div>
 
+  <!-- ======================================================== -->
+  <!-- MODAL: CREAR / EDITAR RECURSO                           -->
+  <!-- ======================================================== -->
+  <div class="modal fade" id="modal-resource" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold" id="modal-resource-title">Nuevo Recurso</h5>
+          <button type="button" class="btn-close btn-close-white" id="btn-close-resource-modal" aria-label="Cerrar"></button>
+        </div>
+        
+        <form id="form-resource">
+          <div class="modal-body p-4">
+            <input type="hidden" id="resource-id">
+
+            <!-- Nombre del Recurso -->
+            <div class="mb-3">
+              <label for="resource-name" class="form-label fw-bold small text-muted">Nombre del Recurso / Insumo *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="resource-name" 
+                placeholder="Ej. Horas Desarrollador Senior o Licencia de Servidor" 
+                required
+                autocomplete="off"
+                maxlength="100"
+              >
+              <div class="form-text small">Denominación clara del recurso, material, servicio o equipo.</div>
+            </div>
+
+            <!-- Tipo de Unidad -->
+            <div class="mb-3">
+              <label for="resource-unit-type" class="form-label fw-bold small text-muted">Tipo de Unidad de Medida *</label>
+              <select class="form-select" id="resource-unit-type" required>
+                <option value="">-- Selecciona una Unidad --</option>
+                <option value="HORA">HORA (Tiempo de trabajo/consultoría)</option>
+                <option value="UNIDAD">UNIDAD (Piezas, licencias o elementos individuales)</option>
+                <option value="GLOBAL">GLOBAL (Partida global o paquete)</option>
+                <option value="SERVICIO">SERVICIO (Servicios tercerizados)</option>
+                <option value="DIA">DIA (Jornadas diarias)</option>
+                <option value="MES">MES (Subscripciones o mensualidades)</option>
+                <option value="METRO">METRO (Longitud/cableado)</option>
+                <option value="KG">KG (Peso de materiales)</option>
+                <option value="LITRO">LITRO (Volumen de líquidos/combustibles)</option>
+              </select>
+              <div class="form-text small">Criterio con el que se contabiliza y cuantifica este recurso.</div>
+            </div>
+
+            <!-- Costo Unitario USD -->
+            <div class="mb-2">
+              <label for="resource-unit-cost" class="form-label fw-bold small text-muted">Costo Unitario (USD $) *</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light fw-bold text-success">$</span>
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  min="0" 
+                  class="form-control font-monospace fw-bold" 
+                  id="resource-unit-cost" 
+                  placeholder="0.00" 
+                  required
+                >
+                <span class="input-group-text bg-light text-muted small">USD</span>
+              </div>
+              <div class="form-text small">Tarifa de referencia por unidad para el cálculo presupuestario en actividades.</div>
+            </div>
+          </div>
+
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" id="btn-cancel-resource-modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary fw-bold" id="btn-save-resource">Guardar Recurso</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CONFIRMAR ELIMINACIÓN DE RECURSO                  -->
+  <!-- ======================================================== -->
+  <div class="modal fade" id="modal-delete-resource" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title fw-bold">Confirmar Eliminación</h5>
+          <button type="button" class="btn-close btn-close-white" id="btn-close-delete-resource-modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body p-4 text-center">
+          <div class="fs-1 text-danger mb-2">⚠️</div>
+          <h4 class="h5 fw-bold text-dark mb-2">¿Deseas eliminar este recurso?</h4>
+          <p class="text-muted mb-2">Esta acción eliminará el recurso <strong id="delete-resource-name" class="text-dark"></strong> de manera permanente.</p>
+          <div id="delete-resource-warning" class="alert alert-warning text-start small mb-0 d-none"></div>
+        </div>
+        <div class="modal-footer bg-light justify-content-center">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-delete-resource">Cancelar</button>
+          <button type="button" class="btn btn-danger fw-bold" id="btn-confirm-delete-resource">Sí, Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Contenedor para Notificaciones Toast -->
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Script Principal de la Aplicación -->
-  <script type="module" src="./src/app.js"></script>
+  <script type="module" src="./src/app.js?v=mobile4"></script>
 </body>
 </html>

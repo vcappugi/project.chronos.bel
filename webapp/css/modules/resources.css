@@ -1,0 +1,220 @@
+/**
+ * Project Chronos - Resources Module Styles
+ * Designed for Yeti.css with smooth transitions, unit cost badges and responsive mobile view.
+ */
+
+.resources-view {
+  animation: fadeInResources 0.25s ease-out;
+}
+
+@keyframes fadeInResources {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.res-row-title {
+  font-size: 0.95rem;
+  color: #222222;
+}
+
+/* ========================================================================== */
+/* Mobile Web & Android: Summarized Resources Table (No Horizontal Scroll)    */
+/* ========================================================================== */
+@media (max-width: 768px), (max-device-width: 768px) {
+  #resources-main-table {
+    table-layout: fixed !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+  }
+
+  #resources-main-table th.th-res-name {
+    width: 53% !important;
+    min-width: 0 !important;
+    padding: 0.5rem 0.35rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  #resources-main-table th.th-res-type,
+  #resources-main-table th.th-res-usage,
+  #resources-main-table th:nth-child(2),
+  #resources-main-table th:nth-child(4) {
+    display: none !important;
+  }
+
+  #resources-main-table th.th-res-cost {
+    width: 27% !important;
+    min-width: 0 !important;
+    padding: 0.5rem 0.25rem !important;
+    font-size: 0.72rem !important;
+    text-align: center !important;
+  }
+
+  #resources-main-table th.th-res-actions,
+  #resources-main-table th:last-child {
+    width: 20% !important;
+    min-width: 0 !important;
+    padding: 0.5rem 0.25rem !important;
+    font-size: 0.72rem !important;
+    text-align: end !important;
+  }
+
+  #resources-table-body td.td-res-name {
+    width: 53% !important;
+    padding: 0.5rem 0.35rem !important;
+    vertical-align: middle !important;
+  }
+
+  #resources-table-body td.td-res-type,
+  #resources-table-body td.td-res-usage,
+  #resources-table-body td:nth-child(2),
+  #resources-table-body td:nth-child(4) {
+    display: none !important;
+  }
+
+  #resources-table-body td.td-res-cost {
+    width: 27% !important;
+    padding: 0.5rem 0.25rem !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    font-size: 0.78rem !important;
+  }
+
+  #resources-table-body td.td-res-actions,
+  #resources-table-body td:last-child {
+    width: 20% !important;
+    padding: 0.5rem 0.25rem !important;
+    text-align: end !important;
+    vertical-align: middle !important;
+  }
+
+  .res-row-title {
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+    word-break: break-word !important;
+  }
+
+  .res-mobile-meta {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    align-items: center;
+    margin-top: 0.2rem;
+  }
+
+  #resources-table-body .btn-group-sm > .btn {
+    padding: 0.22rem 0.35rem !important;
+    font-size: 0.75rem !important;
+    line-height: 1.1 !important;
+  }
+
+  #resources-table-body .badge {
+    font-size: 0.65rem !important;
+    padding: 0.2rem 0.35rem !important;
+    white-space: normal !important;
+    line-height: 1.15;
+    display: inline-block;
+  }
+}
+
+/* Standalone rules for is-mobile-device */
+html.is-mobile-device #resources-main-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+html.is-mobile-device #resources-main-table th.th-res-name {
+  width: 53% !important;
+  min-width: 0 !important;
+  padding: 0.5rem 0.35rem !important;
+  font-size: 0.72rem !important;
+}
+
+html.is-mobile-device #resources-main-table th.th-res-type,
+html.is-mobile-device #resources-main-table th.th-res-usage,
+html.is-mobile-device #resources-main-table th:nth-child(2),
+html.is-mobile-device #resources-main-table th:nth-child(4) {
+  display: none !important;
+}
+
+html.is-mobile-device #resources-main-table th.th-res-cost {
+  width: 27% !important;
+  min-width: 0 !important;
+  padding: 0.5rem 0.25rem !important;
+  font-size: 0.72rem !important;
+  text-align: center !important;
+}
+
+html.is-mobile-device #resources-main-table th.th-res-actions,
+html.is-mobile-device #resources-main-table th:last-child {
+  width: 20% !important;
+  min-width: 0 !important;
+  padding: 0.5rem 0.25rem !important;
+  font-size: 0.72rem !important;
+  text-align: end !important;
+}
+
+html.is-mobile-device #resources-table-body td.td-res-name {
+  width: 53% !important;
+  padding: 0.5rem 0.35rem !important;
+  vertical-align: middle !important;
+}
+
+html.is-mobile-device #resources-table-body td.td-res-type,
+html.is-mobile-device #resources-table-body td.td-res-usage,
+html.is-mobile-device #resources-table-body td:nth-child(2),
+html.is-mobile-device #resources-table-body td:nth-child(4) {
+  display: none !important;
+}
+
+html.is-mobile-device #resources-table-body td.td-res-cost {
+  width: 27% !important;
+  padding: 0.5rem 0.25rem !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  font-size: 0.78rem !important;
+}
+
+html.is-mobile-device #resources-table-body td.td-res-actions,
+html.is-mobile-device #resources-table-body td:last-child {
+  width: 20% !important;
+  padding: 0.5rem 0.25rem !important;
+  text-align: end !important;
+  vertical-align: middle !important;
+}
+
+html.is-mobile-device .res-row-title {
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  word-break: break-word !important;
+}
+
+html.is-mobile-device .res-mobile-meta {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+  margin-top: 0.2rem;
+}
+
+html.is-mobile-device #resources-table-body .btn-group-sm > .btn {
+  padding: 0.22rem 0.35rem !important;
+  font-size: 0.75rem !important;
+  line-height: 1.1 !important;
+}
+
+html.is-mobile-device #resources-table-body .badge {
+  font-size: 0.65rem !important;
+  padding: 0.2rem 0.35rem !important;
+  white-space: normal !important;
+  line-height: 1.15;
+  display: inline-block;
+}

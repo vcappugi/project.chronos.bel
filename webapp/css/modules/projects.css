@@ -161,3 +161,427 @@
     transform: translateY(0);
   }
 }
+
+/* ========================================================================== */
+/* Mobile Web & Android: Ultra-compact Module Cards (Logo & Name only)        */
+/* ========================================================================== */
+@media (max-width: 768px), (max-device-width: 768px) {
+  .modules-nav-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.45rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .module-nav-card {
+    padding: 0.5rem 0.25rem !important;
+    gap: 0.2rem !important;
+    border-radius: 8px !important;
+    align-items: center !important;
+    text-align: center !important;
+    justify-content: center !important;
+    min-height: 72px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .module-nav-card:hover {
+    transform: none !important;
+  }
+
+  .module-nav-card.active {
+    border-color: #008cba !important;
+    border-left: 2px solid #008cba !important;
+    border-width: 2px !important;
+    background: #f0f9fc !important;
+    box-shadow: 0 2px 6px rgba(0, 140, 186, 0.15) !important;
+  }
+
+  .module-icon-container {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    border-radius: 6px !important;
+    font-size: 1.15rem !important;
+    margin: 0 auto 0.2rem auto !important;
+  }
+
+  .module-card-title {
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    line-height: 1.15 !important;
+    text-align: center !important;
+    margin: 0 !important;
+    color: #222222 !important;
+    word-break: break-word !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+
+  /* Sin la descripción en versión móvil y Android */
+  .module-card-desc {
+    display: none !important;
+  }
+
+  /* Chevron de configuración en móvil */
+  #card-module-config .d-flex {
+    justify-content: center !important;
+    position: relative !important;
+    width: 100% !important;
+  }
+
+  #config-card-chevron {
+    position: absolute !important;
+    top: -2px !important;
+    right: 2px !important;
+    font-size: 0.5rem !important;
+    padding: 1px 3px !important;
+  }
+
+  /* Submódulos de Configuración compactos */
+  .submodules-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .submodule-card {
+    padding: 0.45rem 0.5rem !important;
+    gap: 0.45rem !important;
+    align-items: center !important;
+  }
+
+  .submodule-icon {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    font-size: 0.95rem !important;
+  }
+
+  .submodule-title {
+    font-size: 0.75rem !important;
+    margin: 0 !important;
+  }
+
+  .submodule-desc {
+    display: none !important;
+  }
+}
+
+@media (max-width: 350px) {
+  .modules-nav-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* Standalone selector for Android Capacitor app & mobile devices */
+html.is-mobile-device .modules-nav-grid {
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 0.45rem !important;
+  margin-bottom: 1rem !important;
+}
+
+html.is-mobile-device .module-nav-card {
+  padding: 0.5rem 0.25rem !important;
+  gap: 0.2rem !important;
+  border-radius: 8px !important;
+  align-items: center !important;
+  text-align: center !important;
+  justify-content: center !important;
+  min-height: 72px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+html.is-mobile-device .module-nav-card:hover {
+  transform: none !important;
+}
+
+html.is-mobile-device .module-nav-card.active {
+  border-color: #008cba !important;
+  border-left: 2px solid #008cba !important;
+  border-width: 2px !important;
+  background: #f0f9fc !important;
+}
+
+html.is-mobile-device .module-icon-container {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  border-radius: 6px !important;
+  font-size: 1.15rem !important;
+  margin: 0 auto 0.2rem auto !important;
+}
+
+html.is-mobile-device .module-card-title {
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  text-align: center !important;
+  margin: 0 !important;
+  color: #222222 !important;
+  word-break: break-word !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+html.is-mobile-device .module-card-desc {
+  display: none !important;
+}
+
+html.is-mobile-device #card-module-config .d-flex {
+  justify-content: center !important;
+  position: relative !important;
+  width: 100% !important;
+}
+
+html.is-mobile-device #config-card-chevron {
+  position: absolute !important;
+  top: -2px !important;
+  right: 2px !important;
+  font-size: 0.5rem !important;
+  padding: 1px 3px !important;
+}
+
+html.is-mobile-device .submodules-grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 0.5rem !important;
+}
+
+html.is-mobile-device .submodule-card {
+  padding: 0.45rem 0.5rem !important;
+  gap: 0.45rem !important;
+  align-items: center !important;
+}
+
+html.is-mobile-device .submodule-icon {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  font-size: 0.95rem !important;
+}
+
+html.is-mobile-device .submodule-title {
+  font-size: 0.75rem !important;
+  margin: 0 !important;
+}
+
+html.is-mobile-device .submodule-desc {
+  display: none !important;
+}
+
+/* ========================================================================== */
+/* Mobile Web & Android: Summarized Projects Table (No Horizontal Scroll)     */
+/* ========================================================================== */
+@media (max-width: 768px), (max-device-width: 768px) {
+  #projects-main-table {
+    table-layout: fixed !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+  }
+
+  #projects-main-table th.th-project-info {
+    width: 53% !important;
+    min-width: 0 !important;
+    padding: 0.5rem 0.35rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  #projects-main-table th.th-project-status {
+    width: 27% !important;
+    min-width: 0 !important;
+    padding: 0.5rem 0.25rem !important;
+    font-size: 0.72rem !important;
+    text-align: center !important;
+  }
+
+  #projects-main-table th.th-project-dates,
+  #projects-main-table th:nth-child(3) {
+    display: none !important;
+  }
+
+  #projects-main-table th.th-project-actions,
+  #projects-main-table th:nth-child(4),
+  #projects-main-table th:last-child {
+    width: 20% !important;
+    min-width: 0 !important;
+    padding: 0.5rem 0.25rem !important;
+    font-size: 0.72rem !important;
+    text-align: end !important;
+  }
+
+  #projects-table-body td.td-project-info,
+  #projects-table-body td:nth-child(1) {
+    width: 53% !important;
+    padding: 0.5rem 0.35rem !important;
+    vertical-align: middle !important;
+  }
+
+  #projects-table-body td.td-project-status,
+  #projects-table-body td:nth-child(2) {
+    width: 27% !important;
+    padding: 0.5rem 0.25rem !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+  }
+
+  #projects-table-body td.td-project-dates,
+  #projects-table-body td:nth-child(3) {
+    display: none !important;
+  }
+
+  #projects-table-body td.td-project-actions,
+  #projects-table-body td:nth-child(4),
+  #projects-table-body td:last-child {
+    width: 20% !important;
+    padding: 0.5rem 0.25rem !important;
+    text-align: end !important;
+    vertical-align: middle !important;
+  }
+
+  .project-row-name {
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+    word-break: break-word !important;
+  }
+
+  .project-row-desc {
+    display: none !important;
+  }
+
+  .project-row-dates-mobile {
+    display: block !important;
+    font-size: 0.68rem !important;
+    margin-top: 0.15rem !important;
+    color: #6c757d !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .btn-text-desktop {
+    display: none !important;
+  }
+
+  .btn-text-mobile {
+    display: inline !important;
+  }
+
+  #projects-table-body .btn-group-sm > .btn {
+    padding: 0.22rem 0.35rem !important;
+    font-size: 0.75rem !important;
+    line-height: 1.1 !important;
+  }
+
+  #projects-table-body .badge {
+    font-size: 0.65rem !important;
+    padding: 0.2rem 0.35rem !important;
+    white-space: normal !important;
+    line-height: 1.15 !important;
+    display: inline-block !important;
+  }
+}
+
+/* Standalone projects table rules for is-mobile-device */
+html.is-mobile-device #projects-main-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+html.is-mobile-device #projects-main-table th.th-project-info {
+  width: 53% !important;
+  min-width: 0 !important;
+  padding: 0.5rem 0.35rem !important;
+  font-size: 0.72rem !important;
+}
+
+html.is-mobile-device #projects-main-table th.th-project-status {
+  width: 27% !important;
+  min-width: 0 !important;
+  padding: 0.5rem 0.25rem !important;
+  font-size: 0.72rem !important;
+  text-align: center !important;
+}
+
+html.is-mobile-device #projects-main-table th.th-project-dates {
+  display: none !important;
+}
+
+html.is-mobile-device #projects-main-table th.th-project-actions {
+  width: 20% !important;
+  min-width: 0 !important;
+  padding: 0.5rem 0.25rem !important;
+  font-size: 0.72rem !important;
+  text-align: end !important;
+}
+
+html.is-mobile-device #projects-table-body td.td-project-info {
+  width: 53% !important;
+  padding: 0.5rem 0.35rem !important;
+  vertical-align: middle !important;
+}
+
+html.is-mobile-device #projects-table-body td.td-project-status {
+  width: 27% !important;
+  padding: 0.5rem 0.25rem !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+html.is-mobile-device #projects-table-body td.td-project-dates {
+  display: none !important;
+}
+
+html.is-mobile-device #projects-table-body td.td-project-actions {
+  width: 20% !important;
+  padding: 0.5rem 0.25rem !important;
+  text-align: end !important;
+  vertical-align: middle !important;
+}
+
+html.is-mobile-device .project-row-name {
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  word-break: break-word !important;
+}
+
+html.is-mobile-device .project-row-desc {
+  display: none !important;
+}
+
+html.is-mobile-device .project-row-dates-mobile {
+  display: block !important;
+  font-size: 0.68rem !important;
+  margin-top: 0.15rem !important;
+  color: #6c757d !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+html.is-mobile-device .btn-text-desktop {
+  display: none !important;
+}
+
+html.is-mobile-device .btn-text-mobile {
+  display: inline !important;
+}
+
+html.is-mobile-device #projects-table-body .btn-group-sm > .btn {
+  padding: 0.22rem 0.35rem !important;
+  font-size: 0.75rem !important;
+  line-height: 1.1 !important;
+}
+
+html.is-mobile-device #projects-table-body .badge {
+  font-size: 0.65rem !important;
+  padding: 0.2rem 0.35rem !important;
+  white-space: normal !important;
+  line-height: 1.15 !important;
+  display: inline-block !important;
+}
+
+

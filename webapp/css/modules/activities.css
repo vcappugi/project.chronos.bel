@@ -64,3 +64,292 @@
 .btn-manage-act-resources:hover {
   transform: translateY(-1px);
 }
+
+/* ========================================================================== */
+/* Mobile Web & Android: Summarized Activities Table (No Horizontal Scroll)   */
+/* ========================================================================== */
+@media (max-width: 768px), (max-device-width: 768px) {
+  #activities-main-table,
+  .is-mobile-device #activities-main-table {
+    table-layout: fixed;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+  }
+
+  #activities-main-table th.th-act-info,
+  .is-mobile-device #activities-main-table th.th-act-info {
+    width: 54% !important;
+    min-width: 0 !important;
+    padding: 0.5rem 0.35rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  #activities-main-table th.th-act-status,
+  .is-mobile-device #activities-main-table th.th-act-status {
+    width: 26% !important;
+    min-width: 0 !important;
+    padding: 0.5rem 0.25rem !important;
+    font-size: 0.72rem !important;
+    text-align: center !important;
+  }
+
+  #activities-main-table th.th-act-progress,
+  #activities-main-table th.th-act-dates,
+  #activities-main-table th:nth-child(3),
+  #activities-main-table th:nth-child(4),
+  .is-mobile-device #activities-main-table th.th-act-progress,
+  .is-mobile-device #activities-main-table th.th-act-dates,
+  .is-mobile-device #activities-main-table th:nth-child(3),
+  .is-mobile-device #activities-main-table th:nth-child(4) {
+    display: none !important;
+  }
+
+  #activities-main-table th.th-act-actions,
+  #activities-main-table th:nth-child(5),
+  #activities-main-table th:last-child,
+  .is-mobile-device #activities-main-table th.th-act-actions,
+  .is-mobile-device #activities-main-table th:nth-child(5),
+  .is-mobile-device #activities-main-table th:last-child {
+    width: 20% !important;
+    min-width: 0 !important;
+    padding: 0.5rem 0.25rem !important;
+    font-size: 0.72rem !important;
+    text-align: end !important;
+  }
+
+  #activities-table-body td.td-act-info,
+  #activities-table-body td:nth-child(1),
+  .is-mobile-device #activities-table-body td.td-act-info,
+  .is-mobile-device #activities-table-body td:nth-child(1) {
+    width: 54% !important;
+    padding: 0.5rem 0.35rem !important;
+    vertical-align: middle;
+  }
+
+  #activities-table-body td.td-act-status,
+  #activities-table-body td:nth-child(2),
+  .is-mobile-device #activities-table-body td.td-act-status,
+  .is-mobile-device #activities-table-body td:nth-child(2) {
+    width: 26% !important;
+    padding: 0.5rem 0.25rem !important;
+    text-align: center !important;
+    vertical-align: middle;
+  }
+
+  #activities-table-body td.td-act-progress,
+  #activities-table-body td.td-act-dates,
+  #activities-table-body td:nth-child(3),
+  #activities-table-body td:nth-child(4),
+  .is-mobile-device #activities-table-body td.td-act-progress,
+  .is-mobile-device #activities-table-body td.td-act-dates,
+  .is-mobile-device #activities-table-body td:nth-child(3),
+  .is-mobile-device #activities-table-body td:nth-child(4) {
+    display: none !important;
+  }
+
+  #activities-table-body td.td-act-actions,
+  #activities-table-body td:nth-child(5),
+  #activities-table-body td:last-child,
+  .is-mobile-device #activities-table-body td.td-act-actions,
+  .is-mobile-device #activities-table-body td:nth-child(5),
+  .is-mobile-device #activities-table-body td:last-child {
+    width: 20% !important;
+    padding: 0.5rem 0.25rem !important;
+    text-align: end !important;
+    vertical-align: middle;
+  }
+
+  .act-row-name {
+    font-size: 0.8rem !important;
+    font-weight: 700;
+    line-height: 1.25 !important;
+    word-break: break-word !important;
+  }
+
+  .act-row-desc {
+    display: none !important;
+  }
+
+  .act-row-project {
+    font-size: 0.65rem !important;
+    padding: 0.12rem 0.35rem !important;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
+  .act-mobile-summary {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    align-items: center;
+    margin-top: 0.25rem;
+  }
+
+  .act-mobile-btn {
+    font-size: 0.68rem !important;
+    padding: 0.1rem 0.35rem !important;
+    border-radius: 4px !important;
+    line-height: 1.2 !important;
+  }
+
+  .act-mobile-progress {
+    font-size: 0.68rem !important;
+    padding: 0.12rem 0.35rem !important;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .act-mobile-dates {
+    font-size: 0.65rem !important;
+    color: #6c757d;
+    width: 100%;
+    margin-top: 0.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #activities-table-body .btn-group-sm > .btn {
+    padding: 0.22rem 0.35rem !important;
+    font-size: 0.75rem !important;
+    line-height: 1.1;
+  }
+
+  #activities-table-body .badge {
+    font-size: 0.65rem !important;
+    padding: 0.2rem 0.35rem !important;
+    white-space: normal !important;
+    line-height: 1.15;
+    display: inline-block;
+  }
+}
+
+/* Standalone activities table rules for is-mobile-device */
+html.is-mobile-device #activities-main-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+html.is-mobile-device #activities-main-table th.th-act-info {
+  width: 54% !important;
+  min-width: 0 !important;
+  padding: 0.5rem 0.35rem !important;
+  font-size: 0.72rem !important;
+}
+
+html.is-mobile-device #activities-main-table th.th-act-status {
+  width: 26% !important;
+  min-width: 0 !important;
+  padding: 0.5rem 0.25rem !important;
+  font-size: 0.72rem !important;
+  text-align: center !important;
+}
+
+html.is-mobile-device #activities-main-table th.th-act-progress,
+html.is-mobile-device #activities-main-table th.th-act-dates {
+  display: none !important;
+}
+
+html.is-mobile-device #activities-main-table th.th-act-actions {
+  width: 20% !important;
+  min-width: 0 !important;
+  padding: 0.5rem 0.25rem !important;
+  font-size: 0.72rem !important;
+  text-align: end !important;
+}
+
+html.is-mobile-device #activities-table-body td.td-act-info {
+  width: 54% !important;
+  padding: 0.5rem 0.35rem !important;
+  vertical-align: middle !important;
+}
+
+html.is-mobile-device #activities-table-body td.td-act-status {
+  width: 26% !important;
+  padding: 0.5rem 0.25rem !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+html.is-mobile-device #activities-table-body td.td-act-progress,
+html.is-mobile-device #activities-table-body td.td-act-dates {
+  display: none !important;
+}
+
+html.is-mobile-device #activities-table-body td.td-act-actions {
+  width: 20% !important;
+  padding: 0.5rem 0.25rem !important;
+  text-align: end !important;
+  vertical-align: middle !important;
+}
+
+html.is-mobile-device .act-row-name {
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  word-break: break-word !important;
+}
+
+html.is-mobile-device .act-row-desc {
+  display: none !important;
+}
+
+html.is-mobile-device .act-row-project {
+  font-size: 0.65rem !important;
+  padding: 0.12rem 0.35rem !important;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+html.is-mobile-device .act-mobile-summary {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0.25rem !important;
+  align-items: center !important;
+  margin-top: 0.25rem !important;
+}
+
+html.is-mobile-device .act-mobile-btn {
+  font-size: 0.68rem !important;
+  padding: 0.1rem 0.35rem !important;
+  border-radius: 4px !important;
+  line-height: 1.2 !important;
+}
+
+html.is-mobile-device .act-mobile-progress {
+  font-size: 0.68rem !important;
+  padding: 0.12rem 0.35rem !important;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+html.is-mobile-device .act-mobile-dates {
+  font-size: 0.65rem !important;
+  color: #6c757d !important;
+  width: 100% !important;
+  margin-top: 0.1rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+html.is-mobile-device #activities-table-body .btn-group-sm > .btn {
+  padding: 0.22rem 0.35rem !important;
+  font-size: 0.75rem !important;
+  line-height: 1.1 !important;
+}
+
+html.is-mobile-device #activities-table-body .badge {
+  font-size: 0.65rem !important;
+  padding: 0.2rem 0.35rem !important;
+  white-space: normal !important;
+  line-height: 1.15 !important;
+  display: inline-block !important;
+}
+
+

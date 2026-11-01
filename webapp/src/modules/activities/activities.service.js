@@ -400,7 +400,7 @@ export class ActivitiesService {
     const payload = {
       activity_id: activityId,
       resource_id: resourceId,
-      quantity: !isNaN(qty) && qty > 0 ? qty : 1.00,
+      quantity: !isNaN(qty) ? qty : 1.00,
       unit_cost_usd_override: !isNaN(override) && override !== null ? override : null,
       updated_at: new Date().toISOString()
     };
@@ -439,7 +439,7 @@ export class ActivitiesService {
     const override = unitCostOverride !== '' && unitCostOverride != null ? parseFloat(unitCostOverride) : null;
 
     const payload = {
-      quantity: !isNaN(qty) && qty > 0 ? qty : 1.00,
+      quantity: !isNaN(qty) ? qty : 1.00,
       unit_cost_usd_override: !isNaN(override) && override !== null ? override : null,
       updated_at: new Date().toISOString()
     };

@@ -162,7 +162,7 @@ export class ActorsController {
                 ${initials}
               </div>
               <div>
-                <div class="fw-bold text-dark fs-6">${this.escapeHtml(fullName)}</div>
+                <a href="#" class="fw-bold text-primary text-decoration-none fs-6 btn-edit-actor d-inline-block" data-id="${actor.id}" title="Editar Colaborador">${this.escapeHtml(fullName)}</a>
                 <div class="text-muted small">${this.escapeHtml(actor.email)}</div>
               </div>
             </div>
@@ -181,9 +181,6 @@ export class ActorsController {
             <div class="btn-group btn-group-sm" role="group">
               <button class="btn btn-outline-secondary btn-toggle-actor-status" data-id="${actor.id}" data-active="${actor.is_active}" title="${actor.is_active ? 'Desactivar' : 'Activar'}">
                 ${actor.is_active ? '⏸️' : '▶️'}
-              </button>
-              <button class="btn btn-outline-primary btn-edit-actor" data-id="${actor.id}" title="Editar">
-                ✏️
               </button>
               <button class="btn btn-outline-danger btn-delete-actor" data-id="${actor.id}" title="Eliminar">
                 🗑️
@@ -204,7 +201,8 @@ export class ActorsController {
     });
 
     this.tableBody.querySelectorAll('.btn-edit-actor').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
         const id = btn.getAttribute('data-id');
         this.openEditModal(id);
       });

@@ -119,25 +119,28 @@ export class ProjectsController {
 
     this.tableBody.innerHTML = this.projects.map(proj => {
       const statusBadge = this.getStatusBadge(proj.status);
-      const startDate = proj.start_date ? this.formatDate(proj.start_date) : '<span class="text-muted">No definida</span>';
-      const endDate = proj.end_date ? this.formatDate(proj.end_date) : '<span class="text-muted">No definida</span>';
+      const rawStart = proj.start_date ? this.formatDate(proj.start_date) : '';
+      const rawEnd = proj.end_date ? this.formatDate(proj.end_date) : '';
+      const startDate = rawStart || '<span class="text-muted">No definida</span>';
+      const endDate = rawEnd || '<span class="text-muted">No definida</span>';
+      const dateRangeText = (rawStart && rawEnd)
+        ? `📅 ${rawStart} - ${rawEnd}`
+        : (rawStart ? `📅 Desde ${rawStart}` : (rawEnd ? `📅 Hasta ${rawEnd}` : ''));
 
       return `
         <tr>
-          <td>
-            <div class="fw-bold text-dark">${this.escapeHtml(proj.name)}</div>
-            <div class="text-muted small">${this.escapeHtml(proj.description || 'Sin descripción')}</div>
+          <td class="td-project-info">
+            <a href="#" class="fw-bold text-primary text-decoration-none project-row-name btn-edit-project d-inline-block" data-id="${proj.id}" title="Editar Proyecto">${this.escapeHtml(proj.name)}</a>
+            <div class="text-muted small project-row-desc">${this.escapeHtml(proj.description || 'Sin descripción')}</div>
+            ${dateRangeText ? `<div class="project-row-dates-mobile d-none">${dateRangeText}</div>` : ''}
           </td>
-          <td>${statusBadge}</td>
-          <td>
+          <td class="td-project-status text-center">${statusBadge}</td>
+          <td class="td-project-dates">
             <div class="small"><strong>Inicio:</strong> ${startDate}</div>
             <div class="small"><strong>Fin:</strong> ${endDate}</div>
           </td>
-          <td class="text-end">
+          <td class="td-project-actions text-end">
             <div class="btn-group btn-group-sm" role="group">
-              <button class="btn btn-outline-primary btn-edit-project" data-id="${proj.id}" title="Editar">
-                ✏️ Editar
-              </button>
               <button class="btn btn-outline-danger btn-delete-project" data-id="${proj.id}" title="Eliminar">
                 🗑️
               </button>
@@ -149,7 +152,8 @@ export class ProjectsController {
 
     // Attach dynamic click listeners to Edit and Delete buttons
     this.tableBody.querySelectorAll('.btn-edit-project').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
         const id = btn.getAttribute('data-id');
         this.openEditModal(id);
       });

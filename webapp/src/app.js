@@ -7,11 +7,12 @@ import { getDecryptedCredentials, getSupabase } from './config/supabase.client.j
 import { AuthService } from './modules/auth/auth.service.js';
 import { AuthController } from './modules/auth/auth.controller.js';
 import { TimerController } from './modules/timer/timer.controller.js';
-import { DashboardController } from './modules/dashboard/dashboard.controller.js';
-import { ProjectsController } from './modules/projects/projects.controller.js';
-import { ActivitiesController } from './modules/activities/activities.controller.js';
+import { DashboardController } from './modules/dashboard/dashboard.controller.js?v=mobile4';
+import { ProjectsController } from './modules/projects/projects.controller.js?v=mobile4';
+import { ActivitiesController } from './modules/activities/activities.controller.js?v=mobile4';
 import { ActorsController } from './modules/actors/actors.controller.js';
 import { RolesController } from './modules/roles/roles.controller.js';
+import { ResourcesController } from './modules/resources/resources.controller.js?v=mobile4';
 import { NotificationService } from './services/notification.service.js';
 import { NativeService } from './services/native.service.js';
 
@@ -25,6 +26,9 @@ class ChronosApp {
   async init() {
     console.log('[Chronos] Initializing application...');
 
+    // Detect mobile device or Android platform
+    this.detectDevicePlatform();
+
     // Initialize native device hardware features (Capacitor Bridge)
     await NativeService.init();
     this.setupNativeHardwareListeners();
@@ -33,6 +37,23 @@ class ChronosApp {
     this.initControllers();
     await this.initVaultAndSupabase();
     await this.checkInitialSession();
+  }
+
+  detectDevicePlatform() {
+    const checkMobile = () => {
+      const isMobile = NativeService.isNative() || 
+        /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        window.innerWidth <= 768;
+
+      if (isMobile) {
+        document.documentElement.classList.add('is-mobile-device');
+      } else {
+        document.documentElement.classList.remove('is-mobile-device');
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
   }
 
   setupNativeHardwareListeners() {
@@ -53,6 +74,8 @@ class ChronosApp {
           this.projectsController.loadProjects();
         } else if (this.activeTab === 'activities' && this.activitiesController) {
           this.activitiesController.loadActivities();
+        } else if (this.activeTab === 'resources' && this.resourcesController) {
+          this.resourcesController.loadResources();
         } else if (this.activeTab === 'actors' && this.actorsController) {
           this.actorsController.loadActors();
         } else if (this.activeTab === 'roles' && this.rolesController) {
@@ -144,6 +167,7 @@ class ChronosApp {
     const sectionDashboard = document.getElementById('section-dashboard');
     const sectionProjects = document.getElementById('section-projects-crud');
     const sectionActivities = document.getElementById('section-activities-crud');
+    const sectionResources = document.getElementById('section-resources-crud');
     const sectionActors = document.getElementById('section-actors-crud');
     const sectionRoles = document.getElementById('section-roles-crud');
 
@@ -159,6 +183,7 @@ class ChronosApp {
       sectionDashboard?.classList.remove('d-none');
       sectionProjects?.classList.add('d-none');
       sectionActivities?.classList.add('d-none');
+      sectionResources?.classList.add('d-none');
       sectionActors?.classList.add('d-none');
       sectionRoles?.classList.add('d-none');
       if (this.dashboardController) {
@@ -168,6 +193,7 @@ class ChronosApp {
       sectionDashboard?.classList.add('d-none');
       sectionProjects?.classList.remove('d-none');
       sectionActivities?.classList.add('d-none');
+      sectionResources?.classList.add('d-none');
       sectionActors?.classList.add('d-none');
       sectionRoles?.classList.add('d-none');
       if (this.projectsController) {
@@ -177,15 +203,27 @@ class ChronosApp {
       sectionDashboard?.classList.add('d-none');
       sectionProjects?.classList.add('d-none');
       sectionActivities?.classList.remove('d-none');
+      sectionResources?.classList.add('d-none');
       sectionActors?.classList.add('d-none');
       sectionRoles?.classList.add('d-none');
       if (this.activitiesController) {
         this.activitiesController.loadActivities();
       }
+    } else if (moduleName === 'resources') {
+      sectionDashboard?.classList.add('d-none');
+      sectionProjects?.classList.add('d-none');
+      sectionActivities?.classList.add('d-none');
+      sectionResources?.classList.remove('d-none');
+      sectionActors?.classList.add('d-none');
+      sectionRoles?.classList.add('d-none');
+      if (this.resourcesController) {
+        this.resourcesController.loadResources();
+      }
     } else if (moduleName === 'actors') {
       sectionDashboard?.classList.add('d-none');
       sectionProjects?.classList.add('d-none');
       sectionActivities?.classList.add('d-none');
+      sectionResources?.classList.add('d-none');
       sectionActors?.classList.remove('d-none');
       sectionRoles?.classList.add('d-none');
       if (this.actorsController) {
@@ -195,6 +233,7 @@ class ChronosApp {
       sectionDashboard?.classList.add('d-none');
       sectionProjects?.classList.add('d-none');
       sectionActivities?.classList.add('d-none');
+      sectionResources?.classList.add('d-none');
       sectionActors?.classList.add('d-none');
       sectionRoles?.classList.remove('d-none');
       if (this.rolesController) {
@@ -205,10 +244,10 @@ class ChronosApp {
       sectionDashboard?.classList.add('d-none');
       sectionProjects?.classList.add('d-none');
       sectionActivities?.classList.add('d-none');
+      sectionResources?.classList.add('d-none');
       sectionActors?.classList.add('d-none');
       sectionRoles?.classList.add('d-none');
       const moduleLabels = {
-        'resources': 'Recursos',
         'audit': 'Auditoría'
       };
       NotificationService.info(`Módulo ${moduleLabels[moduleName] || moduleName} en preparación.`);
@@ -238,6 +277,14 @@ class ChronosApp {
       onActivityChanged: () => {
         if (this.dashboardController) {
           this.dashboardController.refresh();
+        }
+      }
+    });
+
+    this.resourcesController = new ResourcesController({
+      onResourceChanged: () => {
+        if (this.activitiesController) {
+          // Keep activity resource selectors in sync if needed
         }
       }
     });

@@ -20,6 +20,7 @@ export class ActivitiesController {
     this.activityToDelete = null;
     this.currentActivityForActors = null;
     this.currentActivityForResources = null;
+    this.returnToActivityModal = false;
     this.searchDebounceTimer = null;
 
     this.initElements();
@@ -56,6 +57,10 @@ export class ActivitiesController {
     this.btnSave = document.getElementById('btn-save-activity');
     this.btnCloseModal = document.getElementById('btn-close-activity-modal');
     this.btnCancelModal = document.getElementById('btn-cancel-activity-modal');
+    this.btnModalActActors = document.getElementById('btn-modal-act-actors');
+    this.btnModalActResources = document.getElementById('btn-modal-act-resources');
+    this.modalActActorsBadge = document.getElementById('modal-act-actors-badge');
+    this.modalActResourcesBadge = document.getElementById('modal-act-resources-badge');
 
     // 2. Delete Activity Modal
     this.deleteModal = document.getElementById('modal-delete-activity');
@@ -113,6 +118,8 @@ export class ActivitiesController {
     this.form?.addEventListener('submit', (e) => this.handleFormSubmit(e));
     this.btnCloseModal?.addEventListener('click', () => this.closeModal());
     this.btnCancelModal?.addEventListener('click', () => this.closeModal());
+    this.btnModalActActors?.addEventListener('click', () => this.handleOpenSubModalFromActivityModal('actors'));
+    this.btnModalActResources?.addEventListener('click', () => this.handleOpenSubModalFromActivityModal('resources'));
 
     this.btnConfirmDelete?.addEventListener('click', () => this.handleConfirmDelete());
     this.btnCancelDelete?.addEventListener('click', () => this.closeDeleteModal());
@@ -204,27 +211,42 @@ export class ActivitiesController {
       const projectName = act.proyectos?.name || 'Sin Proyecto';
       const progress = Math.round(Number(act.progress_percentage) || 0);
       const weight = Number(act.weight) || 1.00;
-      const startDate = act.start_date ? this.formatDate(act.start_date) : '<span class="text-muted">No definida</span>';
-      const endDate = act.end_date ? this.formatDate(act.end_date) : '<span class="text-muted">No definida</span>';
-      const actorsCount = act.actorsCount || 0;
-      const totalCostUSD = (act.totalCostUSD || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const rawStart = act.start_date ? this.formatDate(act.start_date) : '';
+      const rawEnd = act.end_date ? this.formatDate(act.end_date) : '';
+      const startDate = rawStart || '<span class="text-muted">No definida</span>';
+      const endDate = rawEnd || '<span class="text-muted">No definida</span>';
 
       let progressClass = 'bg-info';
       if (progress === 100) progressClass = 'bg-success';
       else if (progress >= 50) progressClass = 'bg-primary';
       else if (progress > 0) progressClass = 'bg-warning';
 
+      const dateRangeShort = (rawStart && rawEnd)
+        ? `${rawStart} - ${rawEnd}`
+        : (rawStart || rawEnd || '');
+
       return `
         <tr>
-          <td>
-            <div class="d-flex align-items-center gap-1.5 mb-1">
-              <span class="badge bg-light text-primary border small fw-semibold">📁 ${this.escapeHtml(projectName)}</span>
+          <!-- 1. Info Principal (Actividad, Proyecto, y resumen compacto para móvil) -->
+          <td class="td-act-info">
+            <div class="d-flex align-items-center gap-1 mb-1">
+              <span class="badge bg-light text-primary border act-row-project" title="${this.escapeHtml(projectName)}">📁 ${this.escapeHtml(projectName)}</span>
             </div>
-            <div class="fw-bold text-dark fs-6">${this.escapeHtml(act.name)}</div>
-            <div class="text-muted small">${this.escapeHtml(act.description || 'Sin descripción')}</div>
+            <a href="#" class="fw-bold text-primary text-decoration-none act-row-name btn-edit-activity d-inline-block" data-id="${act.id}" title="Editar Actividad">${this.escapeHtml(act.name)}</a>
+            <div class="text-muted small act-row-desc">${this.escapeHtml(act.description || 'Sin descripción')}</div>
+
+            <!-- Resumen compacto para versión móvil web y Android -->
+            <div class="act-mobile-summary d-none">
+              <span class="badge ${progressClass} act-mobile-progress">${progress}%</span>
+              ${dateRangeShort ? `<span class="act-mobile-dates">📅 ${dateRangeShort}</span>` : ''}
+            </div>
           </td>
-          <td>${statusBadge}</td>
-          <td>
+
+          <!-- 2. Estado -->
+          <td class="td-act-status text-center">${statusBadge}</td>
+
+          <!-- 3. Avance (Desktop) -->
+          <td class="td-act-progress">
             <div class="d-flex align-items-center gap-2 mb-1">
               <div class="progress flex-grow-1" style="height: 6px; width: 100px;">
                 <div class="progress-bar ${progressClass}" role="progressbar" style="width: ${progress}%" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100"></div>
@@ -235,27 +257,16 @@ export class ActivitiesController {
               Peso: <strong>${weight.toFixed(2)}</strong>
             </div>
           </td>
-          <td>
-            <div class="d-flex flex-column gap-1">
-              <!-- Botón Sub-CRUD Actores -->
-              <button class="btn btn-sm btn-outline-info text-start py-0.5 px-2 btn-manage-act-actors" data-id="${act.id}" title="Gestionar participantes de esta actividad">
-                👥 <strong>${actorsCount}</strong> ${actorsCount === 1 ? 'actor' : 'actores'}
-              </button>
-              <!-- Botón Sub-CRUD Recursos -->
-              <button class="btn btn-sm btn-outline-success text-start py-0.5 px-2 btn-manage-act-resources" data-id="${act.id}" title="Gestionar recursos y costos de esta actividad">
-                💵 <strong>$${totalCostUSD}</strong>
-              </button>
-            </div>
-          </td>
-          <td>
+
+          <!-- 4. Plazos (Desktop) -->
+          <td class="td-act-dates">
             <div class="small"><strong>Inicio:</strong> ${startDate}</div>
             <div class="small"><strong>Fin:</strong> ${endDate}</div>
           </td>
-          <td class="text-end">
+
+          <!-- 5. Acciones -->
+          <td class="td-act-actions text-end">
             <div class="btn-group btn-group-sm" role="group">
-              <button class="btn btn-outline-primary btn-edit-activity" data-id="${act.id}" title="Editar Actividad">
-                ✏️
-              </button>
               <button class="btn btn-outline-danger btn-delete-activity" data-id="${act.id}" title="Eliminar Actividad">
                 🗑️
               </button>
@@ -266,22 +277,9 @@ export class ActivitiesController {
     }).join('');
 
     // Attach click listeners
-    this.tableBody.querySelectorAll('.btn-manage-act-actors').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.getAttribute('data-id');
-        this.openActorsModal(id);
-      });
-    });
-
-    this.tableBody.querySelectorAll('.btn-manage-act-resources').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.getAttribute('data-id');
-        this.openResourcesModal(id);
-      });
-    });
-
     this.tableBody.querySelectorAll('.btn-edit-activity').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
         const id = btn.getAttribute('data-id');
         this.openEditModal(id);
       });
@@ -455,6 +453,7 @@ export class ActivitiesController {
 
       await this.loadActivityActors(this.currentActivityForActors.id);
       await this.loadActivities(); // Refresh row counts
+      this.syncCurrentEditingBadges();
     } catch (err) {
       console.error('[ActivitiesController] Error assigning actor:', err);
       NotificationService.error(err.message || 'Error al asignar colaborador.');
@@ -469,6 +468,7 @@ export class ActivitiesController {
       NotificationService.success('Colaborador desvinculado de la actividad.');
       await this.loadActivityActors(this.currentActivityForActors.id);
       await this.loadActivities();
+      this.syncCurrentEditingBadges();
     } catch (err) {
       console.error('[ActivitiesController] Error removing actor:', err);
       NotificationService.error(err.message || 'Error al desvincular colaborador.');
@@ -489,6 +489,12 @@ export class ActivitiesController {
       this.modalActors.style.display = 'none';
       document.body.classList.remove('modal-open');
       this.currentActivityForActors = null;
+    }
+
+    if (this.returnToActivityModal && this.currentEditingId) {
+      this.returnToActivityModal = false;
+      this.syncCurrentEditingBadges();
+      this.showModal();
     }
   }
 
@@ -511,7 +517,7 @@ export class ActivitiesController {
     }
 
     if (this.formAssignResource) this.formAssignResource.reset();
-    if (this.inputAssignResQty) this.inputAssignResQty.value = '1.00';
+    if (this.inputAssignResQty) this.inputAssignResQty.value = '1';
     if (this.inputAssignResOverride) this.inputAssignResOverride.value = '';
 
     await this.populateAvailableResourcesSelect();
@@ -563,7 +569,7 @@ export class ActivitiesController {
       this.tableActivityResourcesBody.innerHTML = assigned.map(item => {
         const resName = item.recursos?.name || 'Recurso desconocido';
         const unitType = item.recursos?.unit_type || 'UNIDAD';
-        const qty = Number(item.quantity) || 1;
+        const qty = item.quantity != null && !isNaN(Number(item.quantity)) ? Number(item.quantity) : 1;
         const unitCost = Number(item.effectiveUnitCost || 0).toFixed(2);
         const subtotal = Number(item.subtotalUSD || 0).toFixed(2);
         const isOverridden = item.unit_cost_usd_override != null;
@@ -620,8 +626,8 @@ export class ActivitiesController {
       return;
     }
 
-    if (!quantity || parseFloat(quantity) <= 0) {
-      NotificationService.warning('Ingresa una cantidad válida mayor a cero.');
+    if (quantity === '' || quantity === null || isNaN(parseFloat(quantity))) {
+      NotificationService.warning('Ingresa una cantidad válida.');
       this.inputAssignResQty?.focus();
       return;
     }
@@ -636,11 +642,12 @@ export class ActivitiesController {
 
       NotificationService.success('Recurso asignado a la actividad exitosamente.');
       if (this.formAssignResource) this.formAssignResource.reset();
-      if (this.inputAssignResQty) this.inputAssignResQty.value = '1.00';
+      if (this.inputAssignResQty) this.inputAssignResQty.value = '1';
       if (this.inputAssignResOverride) this.inputAssignResOverride.value = '';
 
       await this.loadActivityResources(this.currentActivityForResources.id);
       await this.loadActivities();
+      this.syncCurrentEditingBadges();
 
       // Notify parent to recalculate dashboard budget metrics
       if (typeof this.onActivityChanged === 'function') {
@@ -660,6 +667,7 @@ export class ActivitiesController {
       NotificationService.success('Recurso desvinculado de la actividad.');
       await this.loadActivityResources(this.currentActivityForResources.id);
       await this.loadActivities();
+      this.syncCurrentEditingBadges();
 
       if (typeof this.onActivityChanged === 'function') {
         this.onActivityChanged();
@@ -685,14 +693,115 @@ export class ActivitiesController {
       document.body.classList.remove('modal-open');
       this.currentActivityForResources = null;
     }
+
+    if (this.returnToActivityModal && this.currentEditingId) {
+      this.returnToActivityModal = false;
+      this.syncCurrentEditingBadges();
+      this.showModal();
+    }
   }
 
   // =========================================================================
   // MODAL CREAR / EDITAR ACTIVIDAD
   // =========================================================================
 
+  updateModalSubCrudBadges(activity = null) {
+    const actorsCount = activity?.actorsCount || 0;
+    const totalCostUSD = (activity?.totalCostUSD || 0).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    if (this.modalActActorsBadge) {
+      this.modalActActorsBadge.textContent = `${actorsCount} ${actorsCount === 1 ? 'actor' : 'actores'}`;
+    }
+
+    if (this.modalActResourcesBadge) {
+      this.modalActResourcesBadge.textContent = `$${totalCostUSD}`;
+    }
+  }
+
+  syncCurrentEditingBadges() {
+    if (!this.currentEditingId) {
+      this.updateModalSubCrudBadges(null);
+      return;
+    }
+    const act = this.activities.find(a => a.id === this.currentEditingId);
+    this.updateModalSubCrudBadges(act || null);
+  }
+
+  async handleOpenSubModalFromActivityModal(type) {
+    // If creating a new activity, validate and save it first so it has an ID
+    if (!this.currentEditingId) {
+      const projectId = this.inputProjectId?.value;
+      const name = this.inputName?.value?.trim();
+
+      if (!projectId) {
+        NotificationService.warning('Selecciona primero el proyecto asociado para gestionar participantes y costos.');
+        this.inputProjectId?.focus();
+        return;
+      }
+
+      if (!name) {
+        NotificationService.warning('Ingresa primero el nombre de la actividad para gestionar participantes y costos.');
+        this.inputName?.focus();
+        return;
+      }
+
+      const payload = {
+        project_id: projectId,
+        name,
+        description: this.inputDescription?.value || '',
+        weight: parseFloat(this.inputWeight?.value) || 1.00,
+        progress_percentage: parseFloat(this.inputProgress?.value) || 0.00,
+        start_date: this.inputStartDate?.value || null,
+        end_date: this.inputEndDate?.value || null,
+        status: this.inputStatus?.value || 'PENDIENTE'
+      };
+
+      this.setSubmitting(true);
+      try {
+        const created = await ActivitiesService.create(payload);
+        if (!created?.id) {
+          throw new Error('No se pudo crear la actividad.');
+        }
+        this.currentEditingId = created.id;
+        if (this.inputId) this.inputId.value = created.id;
+        if (this.modalTitle) this.modalTitle.textContent = 'Editar Actividad';
+        await this.loadActivities();
+        this.syncCurrentEditingBadges();
+
+        if (typeof this.onActivityChanged === 'function') {
+          this.onActivityChanged();
+        }
+      } catch (err) {
+        console.error('[ActivitiesController] Auto-save before sub-modal error:', err);
+        NotificationService.error(err.message || 'Error al guardar la actividad.');
+        return;
+      } finally {
+        this.setSubmitting(false);
+      }
+    }
+
+    const activityId = this.currentEditingId;
+    if (!activityId) return;
+
+    this.returnToActivityModal = true;
+    if (this.modal) {
+      this.modal.classList.remove('show');
+      this.modal.style.display = 'none';
+    }
+
+    if (type === 'actors') {
+      await this.openActorsModal(activityId);
+    } else if (type === 'resources') {
+      await this.openResourcesModal(activityId);
+    }
+  }
+
   async openCreateModal(defaultProjectId = '') {
     this.currentEditingId = null;
+    this.returnToActivityModal = false;
     if (this.modalTitle) this.modalTitle.textContent = 'Nueva Actividad';
     if (this.form) this.form.reset();
     if (this.inputId) this.inputId.value = '';
@@ -707,6 +816,7 @@ export class ActivitiesController {
     if (this.progressValueDisplay) this.progressValueDisplay.textContent = '0%';
     if (this.inputStatus) this.inputStatus.value = 'PENDIENTE';
 
+    this.updateModalSubCrudBadges(null);
     this.showModal();
   }
 
@@ -715,6 +825,7 @@ export class ActivitiesController {
     if (!activity) return;
 
     this.currentEditingId = id;
+    this.returnToActivityModal = false;
     if (this.modalTitle) this.modalTitle.textContent = 'Editar Actividad';
 
     await this.loadProjectsOptions();
@@ -732,6 +843,8 @@ export class ActivitiesController {
     if (this.inputStartDate) this.inputStartDate.value = activity.start_date || '';
     if (this.inputEndDate) this.inputEndDate.value = activity.end_date || '';
     if (this.inputStatus) this.inputStatus.value = activity.status || 'PENDIENTE';
+
+    this.updateModalSubCrudBadges(activity);
 
     NativeService.impact('light');
     this.showModal();
