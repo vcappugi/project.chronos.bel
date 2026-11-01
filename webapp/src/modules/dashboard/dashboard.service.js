@@ -8,9 +8,11 @@ import { getSupabase } from '../../config/supabase.client.js';
 export class DashboardService {
   /**
    * Fetches and compiles all consolidated metrics for the executive dashboard
+   * @param {Object} [options={}]
+   * @param {string} [options.projectId=''] Optional project UUID filter
    * @returns {Promise<Object>}
    */
-  static async getDashboardSummary() {
+  static async getDashboardSummary({ projectId = '' } = {}) {
     try {
       const supabase = await getSupabase();
 
@@ -19,21 +21,22 @@ export class DashboardService {
         projectsResult,
         activitiesResult,
         actorsResult,
-        summaryResult,
-        auditResult
+        summaryResult
       ] = await Promise.allSettled([
         supabase.from('proyectos').select('*').order('created_at', { ascending: false }),
-        supabase.from('actividades').select('id, project_id, name, weight, progress_percentage, status'),
+        supabase
+          .from('actividades')
+          .select('id, project_id, name, description, weight, progress_percentage, start_date, end_date, status, created_at, proyectos(id, name), actividad_actores(actor_id)')
+          .order('start_date', { ascending: true, nullsFirst: false }),
         supabase.from('actores').select('id, first_name, last_name, is_active'),
-        supabase.from('vw_proyecto_resumen').select('*'),
-        supabase.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(6)
+        supabase.from('vw_proyecto_resumen').select('*')
       ]);
 
-      const projects = projectsResult.status === 'fulfilled' && !projectsResult.value.error 
+      const allProjects = projectsResult.status === 'fulfilled' && !projectsResult.value.error 
         ? (projectsResult.value.data || []) 
         : [];
 
-      const activities = activitiesResult.status === 'fulfilled' && !activitiesResult.value.error 
+      const allActivities = activitiesResult.status === 'fulfilled' && !activitiesResult.value.error 
         ? (activitiesResult.value.data || []) 
         : [];
 
@@ -45,9 +48,14 @@ export class DashboardService {
         ? (summaryResult.value.data || []) 
         : [];
 
-      const auditLogs = auditResult.status === 'fulfilled' && !auditResult.value.error 
-        ? (auditResult.value.data || []) 
-        : [];
+      // Filter by projectId if selected
+      const projects = projectId
+        ? allProjects.filter(p => p.id === projectId)
+        : allProjects;
+
+      const activities = projectId
+        ? allActivities.filter(a => a.project_id === projectId)
+        : allActivities;
 
       // Map summaries by project ID for quick lookup
       const summaryMap = new Map();
@@ -95,22 +103,35 @@ export class DashboardService {
         };
       });
 
-      // Format audit log items
-      const formattedAudit = auditLogs.map(log => this.formatAuditEntry(log));
+      // Compute actors count (unique actors in project activities if filtered, or total actors)
+      let totalActorsCount = actors.length;
+      if (projectId) {
+        const uniqueActorIds = new Set();
+        activities.forEach(act => {
+          if (Array.isArray(act.actividad_actores)) {
+            act.actividad_actores.forEach(aa => {
+              if (aa.actor_id) uniqueActorIds.add(aa.actor_id);
+            });
+          }
+        });
+        totalActorsCount = uniqueActorIds.size;
+      }
 
       return {
+        allProjects,
         totalProjects,
         statusCounts,
         averageProgress,
         totalBudgetUSD,
         totalActivities: activities.length,
-        totalActors: actors.length,
+        totalActors: totalActorsCount,
         projects: enhancedProjects,
-        auditLogs: formattedAudit
+        activities
       };
     } catch (err) {
       console.error('[DashboardService] Error compiling summary:', err);
       return {
+        allProjects: [],
         totalProjects: 0,
         statusCounts: { PLANIFICACION: 0, EN_EJECUCION: 0, SUSPENDIDO: 0, FINALIZADO: 0 },
         averageProgress: 0,
@@ -118,8 +139,54 @@ export class DashboardService {
         totalActivities: 0,
         totalActors: 0,
         projects: [],
-        auditLogs: []
+        activities: []
       };
+    }
+  }
+
+  /**
+   * Retrieves audit logs for the dedicated Audit module
+   * @param {Object} [filters={}]
+   * @param {string} [filters.table]
+   * @param {string} [filters.action]
+   * @param {string} [filters.query]
+   * @returns {Promise<Array>}
+   */
+  static async getAuditLogs({ table = '', action = '', query = '' } = {}) {
+    try {
+      const supabase = await getSupabase();
+      let req = supabase
+        .from('audit_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (table) {
+        req = req.eq('table_name', table);
+      }
+
+      if (action) {
+        req = req.eq('action', action);
+      }
+
+      const { data, error } = await req;
+      if (error) throw error;
+
+      let formatted = (data || []).map(log => this.formatAuditEntry(log));
+
+      if (query) {
+        const qLower = query.toLowerCase();
+        formatted = formatted.filter(item =>
+          item.title.toLowerCase().includes(qLower) ||
+          item.table.toLowerCase().includes(qLower) ||
+          item.badgeLabel.toLowerCase().includes(qLower)
+        );
+      }
+
+      return formatted;
+    } catch (err) {
+      console.error('[DashboardService] Error fetching audit logs:', err);
+      return [];
     }
   }
 

@@ -7,12 +7,12 @@ import { getDecryptedCredentials, getSupabase } from './config/supabase.client.j
 import { AuthService } from './modules/auth/auth.service.js';
 import { AuthController } from './modules/auth/auth.controller.js';
 import { TimerController } from './modules/timer/timer.controller.js';
-import { DashboardController } from './modules/dashboard/dashboard.controller.js?v=mobile6';
-import { ProjectsController } from './modules/projects/projects.controller.js?v=mobile6';
-import { ActivitiesController } from './modules/activities/activities.controller.js?v=mobile6';
-import { ActorsController } from './modules/actors/actors.controller.js?v=mobile6';
+import { DashboardController } from './modules/dashboard/dashboard.controller.js?v=mobile7';
+import { ProjectsController } from './modules/projects/projects.controller.js?v=mobile7';
+import { ActivitiesController } from './modules/activities/activities.controller.js?v=mobile7';
+import { ActorsController } from './modules/actors/actors.controller.js?v=mobile7';
 import { RolesController } from './modules/roles/roles.controller.js';
-import { ResourcesController } from './modules/resources/resources.controller.js?v=mobile6';
+import { ResourcesController } from './modules/resources/resources.controller.js?v=mobile7';
 import { NotificationService } from './services/notification.service.js';
 import { NativeService } from './services/native.service.js';
 
@@ -80,6 +80,8 @@ class ChronosApp {
           this.actorsController.loadActors();
         } else if (this.activeTab === 'roles' && this.rolesController) {
           this.rolesController.loadRoles();
+        } else if (this.activeTab === 'audit' && this.dashboardController) {
+          this.dashboardController.loadAuditModule();
         }
       } else {
         NotificationService.warning('Modo fuera de línea: los registros se guardarán en la memoria local.');
@@ -211,6 +213,7 @@ class ChronosApp {
     const sectionResources = document.getElementById('section-resources-crud');
     const sectionActors = document.getElementById('section-actors-crud');
     const sectionRoles = document.getElementById('section-roles-crud');
+    const sectionAudit = document.getElementById('section-audit-view');
 
     const pillLabels = {
       'dashboard': '📊 Dashboard General',
@@ -238,79 +241,53 @@ class ChronosApp {
       this.setModulesNavCollapsed(true);
     }
 
+    // Hide all sections first
+    sectionDashboard?.classList.add('d-none');
+    sectionProjects?.classList.add('d-none');
+    sectionActivities?.classList.add('d-none');
+    sectionResources?.classList.add('d-none');
+    sectionActors?.classList.add('d-none');
+    sectionRoles?.classList.add('d-none');
+    sectionAudit?.classList.add('d-none');
+
     // Handle module visibility
     if (moduleName === 'dashboard') {
       sectionDashboard?.classList.remove('d-none');
-      sectionProjects?.classList.add('d-none');
-      sectionActivities?.classList.add('d-none');
-      sectionResources?.classList.add('d-none');
-      sectionActors?.classList.add('d-none');
-      sectionRoles?.classList.add('d-none');
       if (this.dashboardController) {
         this.dashboardController.refresh();
       }
     } else if (moduleName === 'projects') {
-      sectionDashboard?.classList.add('d-none');
       sectionProjects?.classList.remove('d-none');
-      sectionActivities?.classList.add('d-none');
-      sectionResources?.classList.add('d-none');
-      sectionActors?.classList.add('d-none');
-      sectionRoles?.classList.add('d-none');
       if (this.projectsController) {
         this.projectsController.loadProjects();
       }
     } else if (moduleName === 'activities') {
-      sectionDashboard?.classList.add('d-none');
-      sectionProjects?.classList.add('d-none');
       sectionActivities?.classList.remove('d-none');
-      sectionResources?.classList.add('d-none');
-      sectionActors?.classList.add('d-none');
-      sectionRoles?.classList.add('d-none');
       if (this.activitiesController) {
         this.activitiesController.loadActivities();
       }
     } else if (moduleName === 'resources') {
-      sectionDashboard?.classList.add('d-none');
-      sectionProjects?.classList.add('d-none');
-      sectionActivities?.classList.add('d-none');
       sectionResources?.classList.remove('d-none');
-      sectionActors?.classList.add('d-none');
-      sectionRoles?.classList.add('d-none');
       if (this.resourcesController) {
         this.resourcesController.loadResources();
       }
     } else if (moduleName === 'actors') {
-      sectionDashboard?.classList.add('d-none');
-      sectionProjects?.classList.add('d-none');
-      sectionActivities?.classList.add('d-none');
-      sectionResources?.classList.add('d-none');
       sectionActors?.classList.remove('d-none');
-      sectionRoles?.classList.add('d-none');
       if (this.actorsController) {
         this.actorsController.loadActors();
       }
     } else if (moduleName === 'roles') {
-      sectionDashboard?.classList.add('d-none');
-      sectionProjects?.classList.add('d-none');
-      sectionActivities?.classList.add('d-none');
-      sectionResources?.classList.add('d-none');
-      sectionActors?.classList.add('d-none');
       sectionRoles?.classList.remove('d-none');
       if (this.rolesController) {
         this.rolesController.loadRoles();
       }
+    } else if (moduleName === 'audit') {
+      sectionAudit?.classList.remove('d-none');
+      if (this.dashboardController) {
+        this.dashboardController.loadAuditModule();
+      }
     } else {
-      // For upcoming modules, keep previous view or notify
-      sectionDashboard?.classList.add('d-none');
-      sectionProjects?.classList.add('d-none');
-      sectionActivities?.classList.add('d-none');
-      sectionResources?.classList.add('d-none');
-      sectionActors?.classList.add('d-none');
-      sectionRoles?.classList.add('d-none');
-      const moduleLabels = {
-        'audit': 'Auditoría'
-      };
-      NotificationService.info(`Módulo ${moduleLabels[moduleName] || moduleName} en preparación.`);
+      NotificationService.info(`Módulo ${moduleName} en preparación.`);
     }
   }
 

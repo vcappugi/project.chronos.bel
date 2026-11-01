@@ -18,13 +18,13 @@
 
   <!-- Yeti.css (Primary Framework) & Custom Styles -->
   <link rel="stylesheet" href="./css/yeti.css">
-  <link rel="stylesheet" href="./css/chronos-custom.css?v=mobile6">
-  <link rel="stylesheet" href="./css/modules/projects.css?v=mobile6">
-  <link rel="stylesheet" href="./css/modules/dashboard.css?v=mobile6">
-  <link rel="stylesheet" href="./css/modules/activities.css?v=mobile6">
-  <link rel="stylesheet" href="./css/modules/actors.css?v=mobile6">
-  <link rel="stylesheet" href="./css/modules/roles.css?v=mobile6">
-  <link rel="stylesheet" href="./css/modules/resources.css?v=mobile6">
+  <link rel="stylesheet" href="./css/chronos-custom.css?v=mobile7">
+  <link rel="stylesheet" href="./css/modules/projects.css?v=mobile7">
+  <link rel="stylesheet" href="./css/modules/dashboard.css?v=mobile7">
+  <link rel="stylesheet" href="./css/modules/activities.css?v=mobile7">
+  <link rel="stylesheet" href="./css/modules/actors.css?v=mobile7">
+  <link rel="stylesheet" href="./css/modules/roles.css?v=mobile7">
+  <link rel="stylesheet" href="./css/modules/resources.css?v=mobile7">
 
   <!-- Supabase Library (Utilizada en segundo plano) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -284,6 +284,9 @@
             </div>
 
             <div class="d-flex align-items-center gap-2 dash-header-actions">
+              <select id="dash-filter-project" class="form-select form-select-sm shadow-sm dash-project-filter" title="Filtrar por Proyecto">
+                <option value="">📁 Todos los Proyectos</option>
+              </select>
               <button id="btn-refresh-dashboard" class="btn btn-outline-secondary fw-semibold shadow-sm d-flex align-items-center gap-2" title="Recargar métricas">
                 <span id="dash-refresh-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
                 <span>🔄</span> <span class="dash-btn-label">Actualizar</span>
@@ -417,10 +420,9 @@
             </div>
           </div>
 
-          <!-- Columna Derecha (4 cols): Distribución y Actividad Reciente -->
+          <!-- Columna Derecha (4 cols): Distribución por Estado -->
           <div class="col-lg-4">
-            <!-- Distribución por Estado -->
-            <div class="card border-0 shadow-sm mb-4 dash-section-card" id="dash-distribution-card">
+            <div class="card border-0 shadow-sm mb-4 dash-section-card h-100" id="dash-distribution-card">
               <div class="card-header bg-white py-3 border-0 dash-section-header">
                 <h5 class="h6 mb-0 fw-bold text-dark d-flex align-items-center gap-2 dash-section-title">
                   <span>🎯</span> Distribución por Estado
@@ -432,21 +434,30 @@
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Auditoría y Actividad Reciente -->
-            <div class="card border-0 shadow-sm dash-section-card" id="dash-audit-card">
-              <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center dash-section-header">
-                <h5 class="h6 mb-0 fw-bold text-dark d-flex align-items-center gap-2 dash-section-title">
-                  <span>🛡️</span> Actividad Reciente
-                </h5>
-                <span class="badge bg-light text-muted border small">Auditoría</span>
-              </div>
-              <div class="card-body p-0">
-                <div class="list-group list-group-flush" id="dash-audit-recent-list">
-                  <!-- Dinámico -->
+          <!-- Fila 3 (12 cols): Diagrama de Gantt de Actividades por Proyecto -->
+          <div class="col-12">
+            <div class="card border-0 shadow-sm dash-section-card" id="dash-gantt-card">
+              <div class="card-header bg-white py-3 border-0 d-flex flex-wrap justify-content-between align-items-center gap-2 dash-section-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fs-5 dash-section-icon">📊</span>
+                  <h4 class="h5 mb-0 fw-bold text-dark dash-section-title">Diagrama de Gantt de Actividades por Proyecto</h4>
+                  <span class="badge bg-light text-muted border small" id="dash-gantt-count-badge">0 actividades</span>
                 </div>
-                <div id="dash-audit-empty" class="text-center py-4 text-muted small d-none">
-                  No hay registros de auditoría recientes.
+                <div class="d-flex align-items-center gap-2 small text-muted gantt-legend">
+                  <span class="d-inline-flex align-items-center gap-1"><span class="gantt-dot bg-secondary"></span>Pendiente</span>
+                  <span class="d-inline-flex align-items-center gap-1"><span class="gantt-dot bg-primary"></span>En Proceso</span>
+                  <span class="d-inline-flex align-items-center gap-1"><span class="gantt-dot bg-warning"></span>Suspendida</span>
+                  <span class="d-inline-flex align-items-center gap-1"><span class="gantt-dot bg-success"></span>Finalizada</span>
+                </div>
+              </div>
+              <div class="card-body p-3 pt-1 dash-gantt-body">
+                <div id="dash-gantt-container" class="gantt-chart-wrapper">
+                  <!-- Renderizado dinámicamente -->
+                </div>
+                <div id="dash-gantt-empty" class="text-center py-4 text-muted small d-none">
+                  No hay actividades registradas para mostrar en el cronograma Gantt.
                 </div>
               </div>
             </div>
@@ -819,6 +830,77 @@
           <div class="fs-1 mb-2">👑</div>
           <h4 class="h5 fw-bold text-dark">No hay roles registrados</h4>
           <p class="text-muted small mb-0">Comienza haciendo clic en el botón <strong>"Nuevo Rol"</strong>.</p>
+        </div>
+
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- 6. MÓDULO DE AUDITORÍA Y ACTIVIDAD RECIENTE          -->
+      <!-- ==================================================== -->
+      <section id="section-audit-view" class="card border-0 shadow-sm d-none">
+        
+        <!-- Header del Módulo de Auditoría -->
+        <div class="card-header bg-white py-3 border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fs-4">🛡️</span>
+            <h3 class="h4 mb-0 fw-bold text-dark">Auditoría y Actividad Reciente</h3>
+            <span id="audit-count-badge" class="badge bg-secondary">0 eventos</span>
+            <div id="audit-loading" class="spinner-border spinner-border-sm text-primary d-none" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+          <button id="btn-refresh-audit" class="btn btn-outline-secondary btn-sm fw-semibold shadow-sm d-flex align-items-center gap-1">
+            <span>🔄</span> <span>Actualizar</span>
+          </button>
+        </div>
+
+        <!-- Barra de Búsqueda y Filtros de Auditoría -->
+        <div class="card-body border-top border-bottom py-3 bg-light">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-5 col-lg-5">
+              <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">🔍</span>
+                <input 
+                  type="text" 
+                  id="audit-search-input" 
+                  class="form-control border-start-0" 
+                  placeholder="Buscar en eventos de auditoría..."
+                  autocomplete="off"
+                >
+              </div>
+            </div>
+            <div class="col-md-4 col-lg-4">
+              <select id="audit-filter-table" class="form-select">
+                <option value="">Todos los Módulos / Tablas</option>
+                <option value="proyectos">Proyectos</option>
+                <option value="actividades">Actividades</option>
+                <option value="recursos">Recursos</option>
+                <option value="actividad_recursos">Costos de Actividades</option>
+                <option value="actores">Actores / Colaboradores</option>
+                <option value="roles">Roles</option>
+              </select>
+            </div>
+            <div class="col-md-3 col-lg-3">
+              <select id="audit-filter-action" class="form-select">
+                <option value="">Todas las Acciones</option>
+                <option value="INSERT">Creación (INSERT)</option>
+                <option value="UPDATE">Modificación (UPDATE)</option>
+                <option value="DELETE">Eliminación (DELETE)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Listado de Actividad Reciente y Trazabilidad -->
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush" id="audit-module-list">
+            <!-- Eventos renderizados dinámicamente -->
+          </div>
+          <div id="audit-module-empty" class="text-center py-5 text-muted small d-none">
+            <div class="fs-1 mb-2">🛡️</div>
+            <h5 class="fw-bold text-dark mb-1">Sin eventos de auditoría</h5>
+            <p class="mb-0">No se encontraron registros de actividad reciente con los filtros seleccionados.</p>
+          </div>
         </div>
 
       </section>
@@ -1574,6 +1656,6 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Script Principal de la Aplicación -->
-  <script type="module" src="./src/app.js?v=mobile6"></script>
+  <script type="module" src="./src/app.js?v=mobile7"></script>
 </body>
 </html>

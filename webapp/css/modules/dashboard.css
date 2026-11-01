@@ -160,6 +160,170 @@
   transition: width 0.3s ease;
 }
 
+/* Dashboard Project Filter Select */
+.dash-project-filter {
+  min-width: 200px;
+  max-width: 260px;
+  font-weight: 600;
+  border-color: #cbd5e1;
+}
+
+/* ========================================================================== */
+/* Gantt Chart Styles (Activities by Project)                                 */
+/* ========================================================================== */
+.gantt-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.gantt-chart-wrapper {
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.gantt-timeline-header {
+  display: flex;
+  align-items: center;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #6c757d;
+  padding: 0.45rem 0.65rem;
+}
+
+.gantt-header-label-col {
+  width: 34%;
+  min-width: 150px;
+  padding-right: 0.5rem;
+}
+
+.gantt-header-scale-col {
+  width: 66%;
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+}
+
+.gantt-project-group {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.gantt-project-group:last-child {
+  border-bottom: none;
+}
+
+.gantt-project-header {
+  background: #f1f7fa;
+  color: #006b8f;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.65rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e3eef3;
+}
+
+.gantt-row {
+  display: flex;
+  align-items: center;
+  padding: 0.4rem 0.65rem;
+  border-bottom: 1px solid #f4f6f8;
+  transition: background-color 0.15s ease;
+}
+
+.gantt-row:last-child {
+  border-bottom: none;
+}
+
+.gantt-row:hover {
+  background-color: #fafdff;
+}
+
+.gantt-label-col {
+  width: 34%;
+  min-width: 150px;
+  padding-right: 0.6rem;
+  overflow: hidden;
+}
+
+.gantt-act-name {
+  font-size: 0.82rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gantt-act-meta {
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gantt-track-col {
+  width: 66%;
+  position: relative;
+  height: 22px;
+  background: #f4f6f8;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.gantt-grid-lines {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.gantt-grid-lines span {
+  width: 1px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.gantt-bar-outer {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  opacity: 0.92;
+}
+
+.gantt-bar-progress {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+}
+
+.gantt-bar-label {
+  position: relative;
+  z-index: 1;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
 /* ========================================================================== */
 /* Mobile Web & Android: Single-Viewport Compact Dashboard Layout             */
 /* ========================================================================== */
@@ -209,12 +373,20 @@
 
   .dash-header-title,
   html.is-mobile-device .dash-header-title {
-    font-size: 0.9rem !important;
+    font-size: 0.82rem !important;
     margin-bottom: 0 !important;
     line-height: 1.2 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+  }
+
+  .dash-project-filter,
+  html.is-mobile-device .dash-project-filter {
+    min-width: 115px !important;
+    max-width: 145px !important;
+    font-size: 0.68rem !important;
+    padding: 0.2rem 1.4rem 0.2rem 0.4rem !important;
   }
 
   .dash-header-actions .btn,
@@ -380,37 +552,71 @@
     height: 5px !important;
   }
 
-  /* Ultra-compact Audit Stream (top 2 recent items on mobile) */
-  .audit-stream-item,
-  html.is-mobile-device .audit-stream-item {
-    padding: 0.3rem 0.6rem !important;
-    gap: 0.45rem !important;
-    align-items: center !important;
-  }
-
-  .audit-stream-item:nth-child(n+3),
-  html.is-mobile-device .audit-stream-item:nth-child(n+3) {
+  /* Compact Gantt Chart on Mobile */
+  .gantt-legend,
+  html.is-mobile-device .gantt-legend {
     display: none !important;
   }
 
-  .audit-stream-badge,
-  html.is-mobile-device .audit-stream-badge {
-    font-size: 0.58rem !important;
-    padding: 0.12rem 0.3rem !important;
+  .dash-gantt-body,
+  html.is-mobile-device .dash-gantt-body {
+    padding: 0.25rem 0.45rem 0.45rem 0.45rem !important;
   }
 
-  .audit-stream-desc,
-  html.is-mobile-device .audit-stream-desc {
-    font-size: 0.7rem !important;
-    margin-bottom: 0 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 210px !important;
-  }
-
-  .audit-stream-time,
-  html.is-mobile-device .audit-stream-time {
+  .gantt-timeline-header,
+  html.is-mobile-device .gantt-timeline-header {
+    padding: 0.25rem 0.4rem !important;
     font-size: 0.62rem !important;
+  }
+
+  .gantt-header-label-col,
+  .gantt-label-col,
+  html.is-mobile-device .gantt-header-label-col,
+  html.is-mobile-device .gantt-label-col {
+    width: 42% !important;
+    min-width: 110px !important;
+  }
+
+  .gantt-header-scale-col,
+  .gantt-track-col,
+  html.is-mobile-device .gantt-header-scale-col,
+  html.is-mobile-device .gantt-track-col {
+    width: 58% !important;
+  }
+
+  .gantt-header-scale-col,
+  html.is-mobile-device .gantt-header-scale-col {
+    font-size: 0.58rem !important;
+  }
+
+  .gantt-project-header,
+  html.is-mobile-device .gantt-project-header {
+    padding: 0.2rem 0.4rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  .gantt-row,
+  html.is-mobile-device .gantt-row {
+    padding: 0.22rem 0.4rem !important;
+  }
+
+  .gantt-act-name,
+  html.is-mobile-device .gantt-act-name {
+    font-size: 0.7rem !important;
+  }
+
+  .gantt-act-meta,
+  html.is-mobile-device .gantt-act-meta {
+    font-size: 0.6rem !important;
+  }
+
+  .gantt-track-col,
+  html.is-mobile-device .gantt-track-col {
+    height: 16px !important;
+  }
+
+  .gantt-bar-label,
+  html.is-mobile-device .gantt-bar-label {
+    font-size: 0.56rem !important;
   }
 }
