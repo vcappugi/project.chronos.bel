@@ -44,6 +44,10 @@ export class ActorsController {
     this.inputPhone = document.getElementById('actor-phone');
     this.selectRoleId = document.getElementById('actor-role-id');
     this.selectIsActive = document.getElementById('actor-is-active');
+    this.inputPassword = document.getElementById('actor-password');
+    this.inputPasswordConfirm = document.getElementById('actor-password-confirm');
+    this.passwordHint = document.getElementById('actor-password-hint');
+    this.passwordLabel = document.getElementById('actor-password-label');
     this.btnSave = document.getElementById('btn-save-actor');
     this.btnCloseModal = document.getElementById('btn-close-actor-modal');
     this.btnCancelModal = document.getElementById('btn-cancel-actor-modal');
@@ -156,28 +160,34 @@ export class ActorsController {
 
       return `
         <tr>
-          <td>
-            <div class="d-flex align-items-center gap-2.5">
+          <td class="td-actor-info">
+            <div class="d-flex align-items-start gap-2 actor-info-wrapper">
               <div class="actor-avatar-circle">
                 ${initials}
               </div>
-              <div>
-                <a href="#" class="fw-bold text-primary text-decoration-none fs-6 btn-edit-actor d-inline-block" data-id="${actor.id}" title="Editar Colaborador">${this.escapeHtml(fullName)}</a>
-                <div class="text-muted small">${this.escapeHtml(actor.email)}</div>
+              <div class="actor-main-details">
+                <a href="#" class="fw-bold text-primary text-decoration-none actor-row-name btn-edit-actor d-inline-block" data-id="${actor.id}" title="Editar Colaborador">${this.escapeHtml(fullName)}</a>
+                <div class="text-muted small actor-row-email">${this.escapeHtml(actor.email)}</div>
+                <!-- Resumen visible en móvil (sin cortes ni scroll horizontal) -->
+                <div class="actor-mobile-meta d-none">
+                  ${roleBadge}
+                  <span class="badge bg-light text-dark border font-monospace">⚡ ${activitiesCount} ${activitiesCount === 1 ? 'act.' : 'acts.'}</span>
+                  ${actor.phone ? `<span class="actor-mobile-phone">📞 ${this.escapeHtml(actor.phone)}</span>` : ''}
+                </div>
               </div>
             </div>
           </td>
-          <td>
+          <td class="td-actor-contact">
             <div class="small">${actor.phone ? `📞 ${this.escapeHtml(actor.phone)}` : '<span class="text-muted">No registrado</span>'}</div>
           </td>
-          <td>${roleBadge}</td>
-          <td>${statusBadge}</td>
-          <td>
+          <td class="td-actor-role">${roleBadge}</td>
+          <td class="td-actor-status text-center">${statusBadge}</td>
+          <td class="td-actor-activities">
             <span class="badge bg-light text-dark border font-monospace">
               ⚡ ${activitiesCount} ${activitiesCount === 1 ? 'actividad' : 'actividades'}
             </span>
           </td>
-          <td class="text-end">
+          <td class="td-actor-actions text-end">
             <div class="btn-group btn-group-sm" role="group">
               <button class="btn btn-outline-secondary btn-toggle-actor-status" data-id="${actor.id}" data-active="${actor.is_active}" title="${actor.is_active ? 'Desactivar' : 'Activar'}">
                 ${actor.is_active ? '⏸️' : '▶️'}
@@ -240,6 +250,10 @@ export class ActorsController {
     if (this.modalTitle) this.modalTitle.textContent = 'Nuevo Colaborador';
     if (this.form) this.form.reset();
     if (this.inputId) this.inputId.value = '';
+    if (this.inputPassword) this.inputPassword.value = '';
+    if (this.inputPasswordConfirm) this.inputPasswordConfirm.value = '';
+    if (this.passwordLabel) this.passwordLabel.textContent = 'Clave de Acceso';
+    if (this.passwordHint) this.passwordHint.textContent = 'Define la clave de acceso del colaborador';
 
     await this.loadRolesOptions();
 
@@ -269,6 +283,10 @@ export class ActorsController {
     if (this.inputPhone) this.inputPhone.value = actor.phone || '';
     if (this.selectRoleId) this.selectRoleId.value = actor.role_id || '';
     if (this.selectIsActive) this.selectIsActive.value = String(actor.is_active);
+    if (this.inputPassword) this.inputPassword.value = '';
+    if (this.inputPasswordConfirm) this.inputPasswordConfirm.value = '';
+    if (this.passwordLabel) this.passwordLabel.textContent = 'Nueva Clave';
+    if (this.passwordHint) this.passwordHint.textContent = 'Dejar en blanco para mantener la clave actual';
 
     NativeService.impact('light');
     this.showModal();
@@ -283,6 +301,8 @@ export class ActorsController {
     const roleId = this.selectRoleId?.value;
     const phone = this.inputPhone?.value?.trim() || null;
     const isActive = this.selectIsActive?.value === 'true';
+    const password = this.inputPassword?.value || '';
+    const passwordConfirm = this.inputPasswordConfirm?.value || '';
 
     if (!firstName || !lastName) {
       NotificationService.warning('El nombre y apellido son obligatorios.');
@@ -301,6 +321,19 @@ export class ActorsController {
       return;
     }
 
+    if (password || passwordConfirm) {
+      if (password !== passwordConfirm) {
+        NotificationService.warning('Las claves ingresadas no coinciden.');
+        this.inputPasswordConfirm?.focus();
+        return;
+      }
+      if (password.length < 4) {
+        NotificationService.warning('La clave debe tener al menos 4 caracteres.');
+        this.inputPassword?.focus();
+        return;
+      }
+    }
+
     const payload = {
       first_name: firstName,
       last_name: lastName,
@@ -309,6 +342,10 @@ export class ActorsController {
       role_id: roleId,
       is_active: isActive
     };
+
+    if (password) {
+      payload.password = password;
+    }
 
     this.setSubmitting(true);
 

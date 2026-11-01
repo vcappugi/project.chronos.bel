@@ -34,3 +34,173 @@
   letter-spacing: -0.02em;
   box-shadow: 0 2px 6px rgba(0, 140, 186, 0.25);
 }
+
+.actor-row-name {
+  font-size: 0.95rem;
+}
+
+.actor-main-details {
+  min-width: 0;
+  flex: 1;
+}
+
+/* ========================================================================== */
+/* Mobile Web & Android: Summarized Actors Table (No Cuts, No Horiz Scroll)   */
+/* ========================================================================== */
+@media (max-width: 768px), (max-device-width: 768px) {
+  #actors-main-table,
+  html.is-mobile-device #actors-main-table {
+    table-layout: fixed !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+  }
+
+  #actors-main-table th.th-actor-info,
+  html.is-mobile-device #actors-main-table th.th-actor-info {
+    width: 58% !important;
+    min-width: 0 !important;
+    padding: 0.5rem 0.35rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  #actors-main-table th.th-actor-contact,
+  #actors-main-table th.th-actor-role,
+  #actors-main-table th.th-actor-activities,
+  #actors-main-table th:nth-child(2),
+  #actors-main-table th:nth-child(3),
+  #actors-main-table th:nth-child(5),
+  html.is-mobile-device #actors-main-table th.th-actor-contact,
+  html.is-mobile-device #actors-main-table th.th-actor-role,
+  html.is-mobile-device #actors-main-table th.th-actor-activities,
+  html.is-mobile-device #actors-main-table th:nth-child(2),
+  html.is-mobile-device #actors-main-table th:nth-child(3),
+  html.is-mobile-device #actors-main-table th:nth-child(5) {
+    display: none !important;
+  }
+
+  #actors-main-table th.th-actor-status,
+  #actors-main-table th:nth-child(4),
+  html.is-mobile-device #actors-main-table th.th-actor-status,
+  html.is-mobile-device #actors-main-table th:nth-child(4) {
+    width: 22% !important;
+    min-width: 0 !important;
+    padding: 0.5rem 0.25rem !important;
+    font-size: 0.72rem !important;
+    text-align: center !important;
+  }
+
+  #actors-main-table th.th-actor-actions,
+  #actors-main-table th:nth-child(6),
+  #actors-main-table th:last-child,
+  html.is-mobile-device #actors-main-table th.th-actor-actions,
+  html.is-mobile-device #actors-main-table th:nth-child(6),
+  html.is-mobile-device #actors-main-table th:last-child {
+    width: 20% !important;
+    min-width: 0 !important;
+    padding: 0.5rem 0.25rem !important;
+    font-size: 0.72rem !important;
+    text-align: end !important;
+  }
+
+  #actors-table-body td.td-actor-info,
+  #actors-table-body td:nth-child(1),
+  html.is-mobile-device #actors-table-body td.td-actor-info,
+  html.is-mobile-device #actors-table-body td:nth-child(1) {
+    width: 58% !important;
+    padding: 0.5rem 0.35rem !important;
+    vertical-align: middle !important;
+  }
+
+  #actors-table-body td.td-actor-contact,
+  #actors-table-body td.td-actor-role,
+  #actors-table-body td.td-actor-activities,
+  #actors-table-body td:nth-child(2),
+  #actors-table-body td:nth-child(3),
+  #actors-table-body td:nth-child(5),
+  html.is-mobile-device #actors-table-body td.td-actor-contact,
+  html.is-mobile-device #actors-table-body td.td-actor-role,
+  html.is-mobile-device #actors-table-body td.td-actor-activities,
+  html.is-mobile-device #actors-table-body td:nth-child(2),
+  html.is-mobile-device #actors-table-body td:nth-child(3),
+  html.is-mobile-device #actors-table-body td:nth-child(5) {
+    display: none !important;
+  }
+
+  #actors-table-body td.td-actor-status,
+  #actors-table-body td:nth-child(4),
+  html.is-mobile-device #actors-table-body td.td-actor-status,
+  html.is-mobile-device #actors-table-body td:nth-child(4) {
+    width: 22% !important;
+    padding: 0.5rem 0.25rem !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+  }
+
+  #actors-table-body td.td-actor-actions,
+  #actors-table-body td:nth-child(6),
+  #actors-table-body td:last-child,
+  html.is-mobile-device #actors-table-body td.td-actor-actions,
+  html.is-mobile-device #actors-table-body td:nth-child(6),
+  html.is-mobile-device #actors-table-body td:last-child {
+    width: 20% !important;
+    padding: 0.5rem 0.25rem !important;
+    text-align: end !important;
+    vertical-align: middle !important;
+  }
+
+  .actor-avatar-circle,
+  html.is-mobile-device .actor-avatar-circle {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    font-size: 0.7rem !important;
+    margin-top: 2px !important;
+  }
+
+  .actor-row-name,
+  html.is-mobile-device .actor-row-name {
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    word-break: break-word !important;
+  }
+
+  .actor-row-email,
+  html.is-mobile-device .actor-row-email {
+    font-size: 0.68rem !important;
+    line-height: 1.2 !important;
+    word-break: break-all !important;
+  }
+
+  .actor-mobile-meta,
+  html.is-mobile-device .actor-mobile-meta {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.25rem !important;
+    align-items: center !important;
+    margin-top: 0.25rem !important;
+  }
+
+  .actor-mobile-phone,
+  html.is-mobile-device .actor-mobile-phone {
+    font-size: 0.66rem !important;
+    color: #495057 !important;
+    word-break: break-word !important;
+  }
+
+  #actors-table-body .btn-group-sm > .btn,
+  html.is-mobile-device #actors-table-body .btn-group-sm > .btn {
+    padding: 0.22rem 0.35rem !important;
+    font-size: 0.75rem !important;
+    line-height: 1.1 !important;
+  }
+
+  #actors-table-body .badge,
+  html.is-mobile-device #actors-table-body .badge {
+    font-size: 0.62rem !important;
+    padding: 0.18rem 0.32rem !important;
+    white-space: normal !important;
+    line-height: 1.15 !important;
+    display: inline-block !important;
+  }
+}

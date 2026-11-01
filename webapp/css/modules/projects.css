@@ -2,12 +2,45 @@
  * Project Chronos - Projects & Module Cards Styling (Yeti.css Extensions)
  */
 
+/* Collapsible Module Navigation Wrapper & Toggle */
+.modules-nav-collapsible-wrapper {
+  margin-bottom: 1rem;
+}
+
+.modules-nav-toggle-btn {
+  background: #ffffff !important;
+  border-color: #dee2e6 !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease;
+}
+
+.modules-nav-toggle-btn:hover {
+  border-color: #008cba !important;
+  background: #f8fcfe !important;
+}
+
+.modules-nav-chevron {
+  display: inline-block;
+  transition: transform 0.25s ease;
+  font-size: 0.7rem;
+}
+
+.modules-nav-chevron.rotated {
+  transform: rotate(180deg);
+}
+
 /* Full-width Module Cards Grid */
 .modules-nav-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.25rem;
-  margin-bottom: 2rem;
+  margin-top: 0.75rem;
+  margin-bottom: 1.25rem;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+.modules-nav-grid.is-collapsed {
+  display: none !important;
 }
 
 .module-nav-card {

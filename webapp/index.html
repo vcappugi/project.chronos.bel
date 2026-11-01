@@ -18,13 +18,13 @@
 
   <!-- Yeti.css (Primary Framework) & Custom Styles -->
   <link rel="stylesheet" href="./css/yeti.css">
-  <link rel="stylesheet" href="./css/chronos-custom.css?v=mobile4">
-  <link rel="stylesheet" href="./css/modules/projects.css?v=mobile4">
-  <link rel="stylesheet" href="./css/modules/dashboard.css?v=mobile4">
-  <link rel="stylesheet" href="./css/modules/activities.css?v=mobile4">
-  <link rel="stylesheet" href="./css/modules/actors.css?v=mobile4">
-  <link rel="stylesheet" href="./css/modules/roles.css?v=mobile4">
-  <link rel="stylesheet" href="./css/modules/resources.css?v=mobile4">
+  <link rel="stylesheet" href="./css/chronos-custom.css?v=mobile6">
+  <link rel="stylesheet" href="./css/modules/projects.css?v=mobile6">
+  <link rel="stylesheet" href="./css/modules/dashboard.css?v=mobile6">
+  <link rel="stylesheet" href="./css/modules/activities.css?v=mobile6">
+  <link rel="stylesheet" href="./css/modules/actors.css?v=mobile6">
+  <link rel="stylesheet" href="./css/modules/roles.css?v=mobile6">
+  <link rel="stylesheet" href="./css/modules/resources.css?v=mobile6">
 
   <!-- Supabase Library (Utilizada en segundo plano) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -135,9 +135,28 @@
     <main class="container-fluid px-4 py-4" id="app-workspace-main">
 
       <!-- ==================================================== -->
-      <!-- TARJETAS DE OPCIONES PRINCIPALES                     -->
+      <!-- TARJETAS DE OPCIONES PRINCIPALES (CONTRAÍBLE)        -->
       <!-- ==================================================== -->
-      <section class="modules-nav-grid" aria-label="Módulos del Sistema">
+      <div class="modules-nav-collapsible-wrapper" id="modules-nav-wrapper">
+        <button
+          type="button"
+          id="btn-toggle-modules-nav"
+          class="btn btn-sm btn-light border shadow-sm w-100 d-flex align-items-center justify-content-between px-3 py-2 modules-nav-toggle-btn"
+          aria-expanded="false"
+          aria-controls="modules-nav-grid"
+        >
+          <span class="d-flex align-items-center gap-2 fw-bold text-dark small">
+            <span>🧭</span>
+            <span>Módulos</span>
+            <span class="badge bg-primary fw-semibold" id="active-module-pill">📊 Dashboard General</span>
+          </span>
+          <span class="d-flex align-items-center gap-1 small text-primary fw-semibold">
+            <span id="modules-nav-toggle-label">Mostrar opciones</span>
+            <span id="modules-nav-toggle-chevron" class="modules-nav-chevron">▼</span>
+          </span>
+        </button>
+
+        <section class="modules-nav-grid is-collapsed" id="modules-nav-grid" aria-label="Módulos del Sistema">
         
         <!-- Opción 1: Dashboard General (Activa por defecto, primera a la izquierda) -->
         <div class="module-nav-card active" data-module="dashboard" id="card-module-dashboard">
@@ -205,7 +224,8 @@
           <p class="module-card-desc">Parámetros del sistema, gestión de accesos y seguridad.</p>
         </div>
 
-      </section>
+        </section>
+      </div>
 
       <!-- ==================================================== -->
       <!-- DESPLEGABLE DE TARJETAS DE CONFIGURACIÓN             -->
@@ -252,40 +272,40 @@
       <section id="section-dashboard" class="dashboard-module-view mb-4">
         
         <!-- Header del Dashboard -->
-        <div class="card border-0 shadow-sm mb-4 bg-white">
-          <div class="card-body p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="card border-0 shadow-sm mb-4 bg-white" id="dash-header-card">
+          <div class="card-body p-4 d-flex flex-wrap justify-content-between align-items-center gap-3" id="dash-header-body">
             <div>
-              <div class="d-flex align-items-center gap-2 mb-1">
+              <div class="d-flex align-items-center gap-2 mb-1 dash-header-badge-row">
                 <span class="badge bg-primary px-2 py-1 text-uppercase fw-bold" style="font-size: 0.75rem;">Panel Ejecutivo</span>
                 <span class="text-muted small">| Actualización en Tiempo Real</span>
               </div>
-              <h2 class="h3 fw-bold text-dark mb-1">Dashboard General de Control</h2>
-              <p class="text-muted small mb-0">Consolidado general de operaciones, avance porcentual de proyectos, métricas presupuestarias y actividad de auditoría.</p>
+              <h2 class="h3 fw-bold text-dark mb-1 dash-header-title">Dashboard General de Control</h2>
+              <p class="text-muted small mb-0 dash-header-subtitle">Consolidado general de operaciones, avance porcentual de proyectos, métricas presupuestarias y actividad de auditoría.</p>
             </div>
 
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 dash-header-actions">
               <button id="btn-refresh-dashboard" class="btn btn-outline-secondary fw-semibold shadow-sm d-flex align-items-center gap-2" title="Recargar métricas">
                 <span id="dash-refresh-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
-                <span>🔄 Actualizar</span>
+                <span>🔄</span> <span class="dash-btn-label">Actualizar</span>
               </button>
               <button id="btn-dash-new-project" class="btn btn-primary fw-bold shadow-sm d-flex align-items-center gap-1">
-                <span>➕</span> <span>Nuevo Proyecto</span>
+                <span>➕</span> <span class="dash-btn-label">Nuevo Proyecto</span>
               </button>
             </div>
           </div>
         </div>
 
         <!-- Fila 1: Métricas / KPIs Principales (5 Tarjetas Clave) -->
-        <div class="row g-3 mb-4">
+        <div class="row g-3 mb-4" id="dash-kpi-row">
           <!-- KPI 1: Proyectos Totales -->
-          <div class="col-sm-6 col-lg">
+          <div class="col-sm-6 col-lg dash-kpi-col dash-kpi-col-wide">
             <div class="card border-0 shadow-sm h-100 metric-kpi-card">
               <div class="card-body p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <span class="text-uppercase small fw-bold text-muted">Proyectos</span>
+                <div class="d-flex align-items-center justify-content-between mb-2 kpi-card-top">
+                  <span class="text-uppercase small fw-bold text-muted kpi-card-label">Proyectos</span>
                   <div class="kpi-icon-circle bg-primary-subtle text-primary">📁</div>
                 </div>
-                <div class="h2 fw-bold text-dark mb-1 font-monospace" id="kpi-total-projects">0</div>
+                <div class="h2 fw-bold text-dark mb-1 font-monospace kpi-card-value" id="kpi-total-projects">0</div>
                 <div class="small text-muted d-flex align-items-center gap-1 flex-wrap" id="kpi-projects-breakdown">
                   <span class="badge bg-info text-dark" id="kpi-count-plan">0 Plan</span>
                   <span class="badge bg-primary" id="kpi-count-exec">0 Ejecución</span>
@@ -295,77 +315,77 @@
           </div>
 
           <!-- KPI 2: Avance Global Promedio -->
-          <div class="col-sm-6 col-lg">
+          <div class="col-sm-6 col-lg dash-kpi-col dash-kpi-col-wide">
             <div class="card border-0 shadow-sm h-100 metric-kpi-card">
               <div class="card-body p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <span class="text-uppercase small fw-bold text-muted">Avance Promedio</span>
+                <div class="d-flex align-items-center justify-content-between mb-2 kpi-card-top">
+                  <span class="text-uppercase small fw-bold text-muted kpi-card-label">Avance Promedio</span>
                   <div class="kpi-icon-circle bg-success-subtle text-success">📈</div>
                 </div>
-                <div class="h2 fw-bold text-dark mb-1 font-monospace" id="kpi-avg-progress">0%</div>
-                <div class="progress mt-2" style="height: 6px;">
+                <div class="h2 fw-bold text-dark mb-1 font-monospace kpi-card-value" id="kpi-avg-progress">0%</div>
+                <div class="progress mt-2 kpi-progress-track" style="height: 6px;">
                   <div id="kpi-progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Consolidado ponderado</small>
+                <small class="text-muted d-block mt-1 kpi-card-subtext" style="font-size: 0.75rem;">Consolidado ponderado</small>
               </div>
             </div>
           </div>
 
           <!-- KPI 3: Inversión / Presupuesto Total (USD) -->
-          <div class="col-sm-6 col-lg">
+          <div class="col-sm-6 col-lg dash-kpi-col">
             <div class="card border-0 shadow-sm h-100 metric-kpi-card">
               <div class="card-body p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <span class="text-uppercase small fw-bold text-muted">Gasto Asignado</span>
+                <div class="d-flex align-items-center justify-content-between mb-2 kpi-card-top">
+                  <span class="text-uppercase small fw-bold text-muted kpi-card-label">Gasto Asignado</span>
                   <div class="kpi-icon-circle bg-warning-subtle text-warning">💵</div>
                 </div>
-                <div class="h2 fw-bold text-dark mb-1 font-monospace" id="kpi-total-budget">$0.00</div>
-                <div class="small text-muted" style="font-size: 0.75rem;">Inversión calculada (USD)</div>
+                <div class="h2 fw-bold text-dark mb-1 font-monospace kpi-card-value" id="kpi-total-budget">$0.00</div>
+                <div class="small text-muted kpi-card-subtext" style="font-size: 0.75rem;">Inversión calculada (USD)</div>
               </div>
             </div>
           </div>
 
           <!-- KPI 4: Actividades Registradas -->
-          <div class="col-sm-6 col-lg">
+          <div class="col-sm-6 col-lg dash-kpi-col">
             <div class="card border-0 shadow-sm h-100 metric-kpi-card">
               <div class="card-body p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <span class="text-uppercase small fw-bold text-muted">Actividades</span>
+                <div class="d-flex align-items-center justify-content-between mb-2 kpi-card-top">
+                  <span class="text-uppercase small fw-bold text-muted kpi-card-label">Actividades</span>
                   <div class="kpi-icon-circle bg-info-subtle text-info">⚡</div>
                 </div>
-                <div class="h2 fw-bold text-dark mb-1 font-monospace" id="kpi-total-activities">0</div>
-                <div class="small text-muted" style="font-size: 0.75rem;">Tareas operativas</div>
+                <div class="h2 fw-bold text-dark mb-1 font-monospace kpi-card-value" id="kpi-total-activities">0</div>
+                <div class="small text-muted kpi-card-subtext" style="font-size: 0.75rem;">Tareas operativas</div>
               </div>
             </div>
           </div>
 
           <!-- KPI 5: Equipo / Colaboradores -->
-          <div class="col-sm-6 col-lg">
+          <div class="col-sm-6 col-lg dash-kpi-col">
             <div class="card border-0 shadow-sm h-100 metric-kpi-card">
               <div class="card-body p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <span class="text-uppercase small fw-bold text-muted">Equipo</span>
+                <div class="d-flex align-items-center justify-content-between mb-2 kpi-card-top">
+                  <span class="text-uppercase small fw-bold text-muted kpi-card-label">Equipo</span>
                   <div class="kpi-icon-circle bg-secondary-subtle text-secondary">👥</div>
                 </div>
-                <div class="h2 fw-bold text-dark mb-1 font-monospace" id="kpi-total-actors">0</div>
-                <div class="small text-muted" style="font-size: 0.75rem;">Actores vinculados</div>
+                <div class="h2 fw-bold text-dark mb-1 font-monospace kpi-card-value" id="kpi-total-actors">0</div>
+                <div class="small text-muted kpi-card-subtext" style="font-size: 0.75rem;">Actores vinculados</div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Fila 2: Tablas y Desglose Visual (2 Columnas: 8 cols y 4 cols) -->
-        <div class="row g-4">
+        <div class="row g-4" id="dash-main-content-row">
           <!-- Columna Izquierda (8 cols): Resumen de Proyectos y Progreso -->
           <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mb-4">
-              <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+            <div class="card border-0 shadow-sm mb-4 dash-section-card" id="dash-projects-card">
+              <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center dash-section-header">
                 <div class="d-flex align-items-center gap-2">
-                  <span class="fs-5">📁</span>
-                  <h4 class="h5 mb-0 fw-bold text-dark">Estado y Avance de Proyectos</h4>
+                  <span class="fs-5 dash-section-icon">📁</span>
+                  <h4 class="h5 mb-0 fw-bold text-dark dash-section-title">Estado y Avance de Proyectos</h4>
                 </div>
-                <button id="btn-dash-view-all-projects" class="btn btn-sm btn-outline-primary fw-semibold">
-                  Ver Todos en Gestión →
+                <button id="btn-dash-view-all-projects" class="btn btn-sm btn-outline-primary fw-semibold dash-view-all-btn">
+                  Ver Todos <span class="d-none d-sm-inline">en Gestión </span>→
                 </button>
               </div>
 
@@ -400,13 +420,13 @@
           <!-- Columna Derecha (4 cols): Distribución y Actividad Reciente -->
           <div class="col-lg-4">
             <!-- Distribución por Estado -->
-            <div class="card border-0 shadow-sm mb-4">
-              <div class="card-header bg-white py-3 border-0">
-                <h5 class="h6 mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+            <div class="card border-0 shadow-sm mb-4 dash-section-card" id="dash-distribution-card">
+              <div class="card-header bg-white py-3 border-0 dash-section-header">
+                <h5 class="h6 mb-0 fw-bold text-dark d-flex align-items-center gap-2 dash-section-title">
                   <span>🎯</span> Distribución por Estado
                 </h5>
               </div>
-              <div class="card-body pt-0 pb-3">
+              <div class="card-body pt-0 pb-3 dash-distribution-body">
                 <div class="d-flex flex-column gap-3" id="dash-status-distribution-container">
                   <!-- Dinámico -->
                 </div>
@@ -414,9 +434,9 @@
             </div>
 
             <!-- Auditoría y Actividad Reciente -->
-            <div class="card border-0 shadow-sm">
-              <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
-                <h5 class="h6 mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+            <div class="card border-0 shadow-sm dash-section-card" id="dash-audit-card">
+              <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center dash-section-header">
+                <h5 class="h6 mb-0 fw-bold text-dark d-flex align-items-center gap-2 dash-section-title">
                   <span>🛡️</span> Actividad Reciente
                 </h5>
                 <span class="badge bg-light text-muted border small">Auditoría</span>
@@ -713,15 +733,15 @@
 
         <!-- Tabla de Actores (Yeti.css) -->
         <div class="table-responsive">
-          <table class="table table-hover table-striped align-middle mb-0">
+          <table class="table table-hover table-striped align-middle mb-0" id="actors-main-table">
             <thead class="table-light text-uppercase small fw-bold">
               <tr>
-                <th style="min-width: 260px;">Colaborador</th>
-                <th style="width: 160px;">Contacto</th>
-                <th style="width: 160px;">Rol Asignado</th>
-                <th style="width: 120px;">Estado</th>
-                <th style="width: 160px;">Actividades</th>
-                <th class="text-end" style="width: 140px;">Acciones</th>
+                <th class="th-actor-info">Colaborador</th>
+                <th class="th-actor-contact">Contacto</th>
+                <th class="th-actor-role">Rol Asignado</th>
+                <th class="th-actor-status text-center">Estado</th>
+                <th class="th-actor-activities">Actividades</th>
+                <th class="th-actor-actions text-end">Acciones</th>
               </tr>
             </thead>
             <tbody id="actors-table-body">
@@ -1299,7 +1319,7 @@
               </div>
             </div>
 
-            <div class="row g-3 mb-2">
+            <div class="row g-3 mb-3">
               <div class="col-md-8">
                 <label for="actor-role-id" class="form-label fw-bold small text-muted">Rol en el Sistema *</label>
                 <select class="form-select" id="actor-role-id" required>
@@ -1312,6 +1332,36 @@
                   <option value="true">Activo</option>
                   <option value="false">Inactivo</option>
                 </select>
+              </div>
+            </div>
+
+            <!-- Campos de Clave / Contraseña del Usuario -->
+            <div class="pt-3 border-top">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="form-label fw-bold small text-muted mb-0">🔐 Credenciales de Acceso (Clave)</label>
+                <span class="small text-muted" id="actor-password-hint">Opcional al editar (dejar en blanco para mantener actual)</span>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="actor-password" class="form-label fw-bold small text-muted" id="actor-password-label">Nueva Clave</label>
+                  <input 
+                    type="password" 
+                    class="form-control" 
+                    id="actor-password" 
+                    placeholder="Ingresa la clave de acceso" 
+                    autocomplete="new-password"
+                  >
+                </div>
+                <div class="col-md-6">
+                  <label for="actor-password-confirm" class="form-label fw-bold small text-muted">Confirmar Clave</label>
+                  <input 
+                    type="password" 
+                    class="form-control" 
+                    id="actor-password-confirm" 
+                    placeholder="Repite la clave de acceso" 
+                    autocomplete="new-password"
+                  >
+                </div>
               </div>
             </div>
           </div>
@@ -1524,6 +1574,6 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Script Principal de la Aplicación -->
-  <script type="module" src="./src/app.js?v=mobile4"></script>
+  <script type="module" src="./src/app.js?v=mobile6"></script>
 </body>
 </html>

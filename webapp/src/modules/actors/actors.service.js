@@ -72,6 +72,20 @@ export class ActorsService {
   }
 
   /**
+   * Computes SHA-256 hash prefixed with sha256: for password verification
+   * @param {string} plainPassword
+   * @returns {Promise<string>}
+   */
+  static async hashPassword(plainPassword) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(plainPassword);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return `sha256:${hashHex}`;
+  }
+
+  /**
    * Creates a new actor
    * @param {Object} actorData
    */
@@ -87,6 +101,10 @@ export class ActorsService {
       is_active: actorData.is_active !== undefined ? Boolean(actorData.is_active) : true,
       updated_at: new Date().toISOString()
     };
+
+    if (actorData.password) {
+      payload.password_hash = await this.hashPassword(actorData.password);
+    }
 
     const { data, error } = await supabase
       .from('actores')
@@ -121,6 +139,21 @@ export class ActorsService {
       is_active: actorData.is_active !== undefined ? Boolean(actorData.is_active) : true,
       updated_at: new Date().toISOString()
     };
+
+    if (actorData.password) {
+      payload.password_hash = await this.hashPassword(actorData.password);
+
+      // If the updated actor matches the currently authenticated Supabase user, also sync Supabase Auth password
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const currentAuthEmail = sessionData?.session?.user?.email?.toLowerCase();
+        if (currentAuthEmail && currentAuthEmail === payload.email && actorData.password.length >= 6) {
+          await supabase.auth.updateUser({ password: actorData.password });
+        }
+      } catch (syncErr) {
+        console.warn('[ActorsService] Note: Supabase Auth password sync skipped:', syncErr);
+      }
+    }
 
     const { data, error } = await supabase
       .from('actores')

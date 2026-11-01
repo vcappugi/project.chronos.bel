@@ -7,12 +7,12 @@ import { getDecryptedCredentials, getSupabase } from './config/supabase.client.j
 import { AuthService } from './modules/auth/auth.service.js';
 import { AuthController } from './modules/auth/auth.controller.js';
 import { TimerController } from './modules/timer/timer.controller.js';
-import { DashboardController } from './modules/dashboard/dashboard.controller.js?v=mobile4';
-import { ProjectsController } from './modules/projects/projects.controller.js?v=mobile4';
-import { ActivitiesController } from './modules/activities/activities.controller.js?v=mobile4';
-import { ActorsController } from './modules/actors/actors.controller.js';
+import { DashboardController } from './modules/dashboard/dashboard.controller.js?v=mobile6';
+import { ProjectsController } from './modules/projects/projects.controller.js?v=mobile6';
+import { ActivitiesController } from './modules/activities/activities.controller.js?v=mobile6';
+import { ActorsController } from './modules/actors/actors.controller.js?v=mobile6';
 import { RolesController } from './modules/roles/roles.controller.js';
-import { ResourcesController } from './modules/resources/resources.controller.js?v=mobile4';
+import { ResourcesController } from './modules/resources/resources.controller.js?v=mobile6';
 import { NotificationService } from './services/notification.service.js';
 import { NativeService } from './services/native.service.js';
 
@@ -88,6 +88,16 @@ class ChronosApp {
   }
 
   bindTabNavigation() {
+    // Collapsible module launcher toggle
+    const btnToggleModulesNav = document.getElementById('btn-toggle-modules-nav');
+    const modulesNavGrid = document.getElementById('modules-nav-grid');
+
+    btnToggleModulesNav?.addEventListener('click', () => {
+      NativeService.impact('light');
+      const isCollapsed = modulesNavGrid?.classList.contains('is-collapsed');
+      this.setModulesNavCollapsed(!isCollapsed);
+    });
+
     // Module launcher cards
     const moduleCards = document.querySelectorAll('.module-nav-card');
     const configPanel = document.getElementById('config-submodules-panel');
@@ -157,6 +167,36 @@ class ChronosApp {
   }
 
   /**
+   * Collapses or expands the top module navigation cards grid
+   * @param {boolean} collapsed
+   */
+  setModulesNavCollapsed(collapsed) {
+    const modulesNavGrid = document.getElementById('modules-nav-grid');
+    const btnToggleModulesNav = document.getElementById('btn-toggle-modules-nav');
+    const toggleLabel = document.getElementById('modules-nav-toggle-label');
+    const toggleChevron = document.getElementById('modules-nav-toggle-chevron');
+    const configPanel = document.getElementById('config-submodules-panel');
+    const configCard = document.getElementById('card-module-config');
+
+    if (!modulesNavGrid) return;
+
+    modulesNavGrid.classList.toggle('is-collapsed', collapsed);
+    btnToggleModulesNav?.setAttribute('aria-expanded', String(!collapsed));
+
+    if (toggleLabel) {
+      toggleLabel.textContent = collapsed ? 'Mostrar opciones' : 'Ocultar opciones';
+    }
+    if (toggleChevron) {
+      toggleChevron.classList.toggle('rotated', !collapsed);
+    }
+
+    if (collapsed && configCard?.classList.contains('config-open')) {
+      configCard.classList.remove('config-open');
+      configPanel?.classList.add('d-none');
+    }
+  }
+
+  /**
    * Switches views and active card state between system modules
    * @param {string} moduleName
    */
@@ -164,6 +204,7 @@ class ChronosApp {
     this.activeTab = moduleName;
 
     const moduleCards = document.querySelectorAll('.module-nav-card');
+    const activeModulePill = document.getElementById('active-module-pill');
     const sectionDashboard = document.getElementById('section-dashboard');
     const sectionProjects = document.getElementById('section-projects-crud');
     const sectionActivities = document.getElementById('section-activities-crud');
@@ -171,12 +212,31 @@ class ChronosApp {
     const sectionActors = document.getElementById('section-actors-crud');
     const sectionRoles = document.getElementById('section-roles-crud');
 
+    const pillLabels = {
+      'dashboard': '📊 Dashboard General',
+      'projects': '📁 Proyectos',
+      'activities': '⚡ Actividades',
+      'resources': '📦 Recursos',
+      'actors': '👥 Actores y Roles',
+      'roles': '👑 Roles',
+      'audit': '🛡️ Auditoría'
+    };
+
+    if (activeModulePill && pillLabels[moduleName]) {
+      activeModulePill.textContent = pillLabels[moduleName];
+    }
+
     // Update active class on top navigation cards
     moduleCards.forEach(card => {
       if (card.getAttribute('data-module') !== 'config') {
         card.classList.toggle('active', card.getAttribute('data-module') === moduleName);
       }
     });
+
+    // Collapse module buttons on dashboard (or on mobile after selection) to maximize workspace
+    if (moduleName === 'dashboard' || document.documentElement.classList.contains('is-mobile-device')) {
+      this.setModulesNavCollapsed(true);
+    }
 
     // Handle module visibility
     if (moduleName === 'dashboard') {
