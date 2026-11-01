@@ -619,4 +619,28 @@
   html.is-mobile-device .gantt-bar-label {
     font-size: 0.56rem !important;
   }
+
+  /* Audit Module Table on Mobile */
+  .th-audit-user,
+  .td-audit-user,
+  .th-audit-module,
+  .td-audit-module,
+  .th-audit-time,
+  .td-audit-time,
+  html.is-mobile-device .th-audit-user,
+  html.is-mobile-device .td-audit-user,
+  html.is-mobile-device .th-audit-module,
+  html.is-mobile-device .td-audit-module,
+  html.is-mobile-device .th-audit-time,
+  html.is-mobile-device .td-audit-time {
+    display: none !important;
+  }
+
+  .audit-mobile-meta,
+  html.is-mobile-device .audit-mobile-meta {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+  }
 }

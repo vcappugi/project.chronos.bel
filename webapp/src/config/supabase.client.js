@@ -63,5 +63,101 @@ export async function getSupabase() {
     }
   });
 
+  attachAuditUserHook(supabaseInstance);
+
   return supabaseInstance;
+}
+
+const AUDITED_TABLES = new Set([
+  'proyectos',
+  'actividades',
+  'recursos',
+  'actividad_recursos',
+  'actores',
+  'roles',
+  'role_permissions',
+  'system_objects'
+]);
+
+function getActiveAuditUser() {
+  try {
+    const raw = localStorage.getItem('chronos_cached_session') || sessionStorage.getItem('chronos_cached_session');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const actor = parsed?.actor;
+      if (actor) {
+        return {
+          id: actor.id || null,
+          name: `${actor.first_name || ''} ${actor.last_name || ''}`.trim() || actor.email || 'Usuario',
+          email: actor.email || ''
+        };
+      }
+      if (parsed?.user?.email) {
+        return {
+          id: parsed.user.id || null,
+          name: parsed.user.email,
+          email: parsed.user.email
+        };
+      }
+    }
+  } catch {
+    // Ignore storage read errors
+  }
+  return null;
+}
+
+function wrapFilterBuilderForAudit(builder, rawFrom, tableName) {
+  if (!builder || typeof builder.then !== 'function') return builder;
+
+  const originalThen = builder.then.bind(builder);
+  builder.then = function (onFulfilled, onRejected) {
+    return originalThen(async (res) => {
+      if (res && !res.error) {
+        const auditUser = getActiveAuditUser();
+        if (auditUser) {
+          try {
+            const { data: logs } = await rawFrom('audit_logs')
+              .select('id, new_data, old_data')
+              .eq('table_name', tableName)
+              .order('created_at', { ascending: false })
+              .limit(1);
+
+            const latestLog = logs?.[0];
+            if (latestLog && !latestLog.new_data?._audit_user && !latestLog.old_data?._audit_user) {
+              const patchPayload = latestLog.new_data
+                ? { new_data: { ...latestLog.new_data, _audit_user: auditUser } }
+                : { old_data: { ...(latestLog.old_data || {}), _audit_user: auditUser } };
+              await rawFrom('audit_logs').update(patchPayload).eq('id', latestLog.id);
+            }
+          } catch {
+            // Non-blocking audit enrichment
+          }
+        }
+      }
+      return typeof onFulfilled === 'function' ? onFulfilled(res) : res;
+    }, onRejected);
+  };
+  return builder;
+}
+
+function attachAuditUserHook(client) {
+  const rawFrom = client.from.bind(client);
+  client.from = function (tableName) {
+    const queryBuilder = rawFrom(tableName);
+    if (!AUDITED_TABLES.has(tableName)) {
+      return queryBuilder;
+    }
+
+    ['insert', 'update', 'delete'].forEach(method => {
+      if (typeof queryBuilder[method] === 'function') {
+        const origMethod = queryBuilder[method].bind(queryBuilder);
+        queryBuilder[method] = function (...args) {
+          const filterBuilder = origMethod(...args);
+          return wrapFilterBuilderForAudit(filterBuilder, rawFrom, tableName);
+        };
+      }
+    });
+
+    return queryBuilder;
+  };
 }

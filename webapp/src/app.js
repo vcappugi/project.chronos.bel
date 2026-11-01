@@ -7,12 +7,12 @@ import { getDecryptedCredentials, getSupabase } from './config/supabase.client.j
 import { AuthService } from './modules/auth/auth.service.js';
 import { AuthController } from './modules/auth/auth.controller.js';
 import { TimerController } from './modules/timer/timer.controller.js';
-import { DashboardController } from './modules/dashboard/dashboard.controller.js?v=mobile9';
-import { ProjectsController } from './modules/projects/projects.controller.js?v=mobile9';
-import { ActivitiesController } from './modules/activities/activities.controller.js?v=mobile9';
-import { ActorsController } from './modules/actors/actors.controller.js?v=mobile9';
+import { DashboardController } from './modules/dashboard/dashboard.controller.js?v=mobile10';
+import { ProjectsController } from './modules/projects/projects.controller.js?v=mobile10';
+import { ActivitiesController } from './modules/activities/activities.controller.js?v=mobile10';
+import { ActorsController } from './modules/actors/actors.controller.js?v=mobile10';
 import { RolesController } from './modules/roles/roles.controller.js';
-import { ResourcesController } from './modules/resources/resources.controller.js?v=mobile9';
+import { ResourcesController } from './modules/resources/resources.controller.js?v=mobile10';
 import { NotificationService } from './services/notification.service.js';
 import { NativeService } from './services/native.service.js';
 

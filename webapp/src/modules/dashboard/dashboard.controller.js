@@ -490,16 +490,35 @@ export class DashboardController {
     if (this.auditModuleEmpty) this.auditModuleEmpty.classList.add('d-none');
 
     this.auditModuleList.innerHTML = logs.map(log => `
-      <div class="audit-stream-item">
-        <span class="audit-stream-badge ${log.badgeClass}">${log.badgeLabel}</span>
-        <div class="flex-grow-1">
+      <tr>
+        <td class="td-audit-action">
+          <span class="audit-stream-badge ${log.badgeClass}">${log.badgeLabel}</span>
+        </td>
+        <td class="td-audit-event">
           <div class="audit-stream-desc fw-semibold text-dark">${this.escapeHtml(log.title)}</div>
-          <div class="audit-stream-time d-flex align-items-center gap-2 mt-0.5">
-            <span>🕒 ${log.timeFormatted}</span>
-            <span class="badge bg-light text-muted border font-monospace" style="font-size: 0.68rem;">${this.escapeHtml(log.table)}</span>
+          <!-- Resumen compacto visible en móvil -->
+          <div class="audit-mobile-meta d-none mt-1">
+            <span class="badge bg-light text-dark border">👤 ${this.escapeHtml(log.userName || 'Sistema')}</span>
+            <span class="badge bg-light text-muted border font-monospace">${this.escapeHtml(log.table)}</span>
+            <span class="text-muted small">🕒 ${log.timeFormatted}</span>
           </div>
-        </div>
-      </div>
+        </td>
+        <td class="td-audit-user">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-size: 0.72rem;">👤</span>
+            <div class="lh-sm">
+              <div class="fw-semibold text-dark small">${this.escapeHtml(log.userName || 'Sistema')}</div>
+              ${log.userEmail ? `<div class="text-muted" style="font-size: 0.72rem;">${this.escapeHtml(log.userEmail)}</div>` : ''}
+            </div>
+          </div>
+        </td>
+        <td class="td-audit-module text-center">
+          <span class="badge bg-light text-muted border font-monospace" style="font-size: 0.72rem;">${this.escapeHtml(log.table)}</span>
+        </td>
+        <td class="td-audit-time text-end">
+          <span class="audit-stream-time">🕒 ${log.timeFormatted}</span>
+        </td>
+      </tr>
     `).join('');
   }
 

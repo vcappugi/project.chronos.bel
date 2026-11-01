@@ -194,17 +194,36 @@ export class DashboardService {
         req = req.eq('action', action);
       }
 
-      const { data, error } = await req;
-      if (error) throw error;
+      const [logsRes, actorsRes] = await Promise.all([
+        req,
+        supabase.from('actores').select('id, user_id, first_name, last_name, email')
+      ]);
 
-      let formatted = (data || []).map(log => this.formatAuditEntry(log));
+      if (logsRes.error) throw logsRes.error;
+
+      const byUserId = new Map();
+      const byActorId = new Map();
+      (actorsRes.data || []).forEach(actor => {
+        const info = {
+          name: `${actor.first_name || ''} ${actor.last_name || ''}`.trim() || actor.email || 'Usuario',
+          email: actor.email || ''
+        };
+        if (actor.user_id) byUserId.set(actor.user_id, info);
+        if (actor.id) byActorId.set(actor.id, info);
+      });
+
+      const actorsLookup = { byUserId, byActorId };
+
+      let formatted = (logsRes.data || []).map(log => this.formatAuditEntry(log, actorsLookup));
 
       if (query) {
         const qLower = query.toLowerCase();
         formatted = formatted.filter(item =>
           item.title.toLowerCase().includes(qLower) ||
           item.table.toLowerCase().includes(qLower) ||
-          item.badgeLabel.toLowerCase().includes(qLower)
+          item.badgeLabel.toLowerCase().includes(qLower) ||
+          item.userName.toLowerCase().includes(qLower) ||
+          item.userEmail.toLowerCase().includes(qLower)
         );
       }
 
@@ -218,13 +237,33 @@ export class DashboardService {
   /**
    * Formats raw audit log entries into human-readable notifications
    * @param {Object} log
+   * @param {Object} [actorsLookup]
    * @returns {Object}
    */
-  static formatAuditEntry(log) {
+  static formatAuditEntry(log, actorsLookup = {}) {
     const table = log.table_name || 'registro';
     const action = log.action || 'INSERT';
     const data = log.new_data || log.old_data || {};
-    const name = data.name || data.first_name || `ID: ${String(log.record_id).slice(0, 8)}`;
+    const name = data.name
+      ? data.name
+      : (data.first_name ? `${data.first_name} ${data.last_name || ''}`.trim() : `ID: ${String(log.record_id).slice(0, 8)}`);
+
+    let userName = 'Sistema';
+    let userEmail = '';
+
+    const auditUser = log.new_data?._audit_user || log.old_data?._audit_user;
+    if (auditUser && (auditUser.name || auditUser.email)) {
+      userName = auditUser.name || auditUser.email;
+      userEmail = auditUser.email || '';
+    } else if (log.changed_by) {
+      const matched = actorsLookup.byUserId?.get(log.changed_by) || actorsLookup.byActorId?.get(log.changed_by);
+      if (matched) {
+        userName = matched.name;
+        userEmail = matched.email;
+      } else {
+        userName = `Usuario (${String(log.changed_by).slice(0, 8)})`;
+      }
+    }
 
     let title = '';
     let badgeClass = 'bg-primary text-white';
@@ -260,7 +299,9 @@ export class DashboardService {
       badgeLabel,
       badgeClass,
       timeFormatted,
-      table
+      table,
+      userName,
+      userEmail
     };
   }
 

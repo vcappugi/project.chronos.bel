@@ -18,13 +18,13 @@
 
   <!-- Yeti.css (Primary Framework) & Custom Styles -->
   <link rel="stylesheet" href="./css/yeti.css">
-  <link rel="stylesheet" href="./css/chronos-custom.css?v=mobile9">
-  <link rel="stylesheet" href="./css/modules/projects.css?v=mobile9">
-  <link rel="stylesheet" href="./css/modules/dashboard.css?v=mobile9">
-  <link rel="stylesheet" href="./css/modules/activities.css?v=mobile9">
-  <link rel="stylesheet" href="./css/modules/actors.css?v=mobile9">
-  <link rel="stylesheet" href="./css/modules/roles.css?v=mobile9">
-  <link rel="stylesheet" href="./css/modules/resources.css?v=mobile9">
+  <link rel="stylesheet" href="./css/chronos-custom.css?v=mobile10">
+  <link rel="stylesheet" href="./css/modules/projects.css?v=mobile10">
+  <link rel="stylesheet" href="./css/modules/dashboard.css?v=mobile10">
+  <link rel="stylesheet" href="./css/modules/activities.css?v=mobile10">
+  <link rel="stylesheet" href="./css/modules/actors.css?v=mobile10">
+  <link rel="stylesheet" href="./css/modules/roles.css?v=mobile10">
+  <link rel="stylesheet" href="./css/modules/resources.css?v=mobile10">
 
   <!-- Supabase Library (Utilizada en segundo plano) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -891,16 +891,27 @@
           </div>
         </div>
 
-        <!-- Listado de Actividad Reciente y Trazabilidad -->
-        <div class="card-body p-0">
-          <div class="list-group list-group-flush" id="audit-module-list">
-            <!-- Eventos renderizados dinámicamente -->
-          </div>
-          <div id="audit-module-empty" class="text-center py-5 text-muted small d-none">
-            <div class="fs-1 mb-2">🛡️</div>
-            <h5 class="fw-bold text-dark mb-1">Sin eventos de auditoría</h5>
-            <p class="mb-0">No se encontraron registros de actividad reciente con los filtros seleccionados.</p>
-          </div>
+        <!-- Tabla de Actividad Reciente y Trazabilidad -->
+        <div class="table-responsive">
+          <table class="table table-hover table-striped align-middle mb-0" id="audit-main-table">
+            <thead class="table-light text-uppercase small fw-bold">
+              <tr>
+                <th class="th-audit-action" style="width: 130px;">Acción</th>
+                <th class="th-audit-event">Evento / Descripción</th>
+                <th class="th-audit-user" style="width: 240px;">Usuario</th>
+                <th class="th-audit-module text-center" style="width: 150px;">Módulo</th>
+                <th class="th-audit-time text-end" style="width: 160px;">Fecha y Hora</th>
+              </tr>
+            </thead>
+            <tbody id="audit-module-list">
+              <!-- Eventos renderizados dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+        <div id="audit-module-empty" class="text-center py-5 text-muted small d-none">
+          <div class="fs-1 mb-2">🛡️</div>
+          <h5 class="fw-bold text-dark mb-1">Sin eventos de auditoría</h5>
+          <p class="mb-0">No se encontraron registros de actividad reciente con los filtros seleccionados.</p>
         </div>
 
       </section>
@@ -1666,6 +1677,6 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Script Principal de la Aplicación -->
-  <script type="module" src="./src/app.js?v=mobile9"></script>
+  <script type="module" src="./src/app.js?v=mobile10"></script>
 </body>
 </html>
